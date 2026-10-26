@@ -1,0 +1,14 @@
+# Dataset
+dataset/
+
+# Large archives
+*.zip
+*.rar
+*.7z
+
+# Python
+__pycache__/
+*.pyc
+
+# Streamlit
+.streamlit/secrets.toml
