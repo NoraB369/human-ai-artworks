@@ -247,7 +247,6 @@ with col1:
         f"""
         **Image A**
 
-        Displayed Label:
         {round_data['display_label_a']}
         """
     )
@@ -263,7 +262,6 @@ with col2:
         f"""
         **Image B**
 
-        Displayed Label:
         {round_data['display_label_b']}
         """
     )
