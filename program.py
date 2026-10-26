@@ -247,6 +247,7 @@ with col1:
         f"""
         **Image A**
 
+        "Label:"
         {round_data['display_label_a']}
         """
     )
