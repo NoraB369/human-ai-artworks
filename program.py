@@ -200,7 +200,7 @@ if st.session_state.page == "intro":
 
     st.title("Human vs AI Image Preference Study")
 
-    st.markdown("style='text-align: center;")
+    st.markdown("---")
 
     st.header("Study Instructions")
 
