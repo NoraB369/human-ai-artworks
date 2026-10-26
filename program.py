@@ -1,59 +1,137 @@
-import streamlit as st
-import pandas as pd
-import random
 import os
-from PIL import Image
-from io import BytesIO
+import random
+import pandas as pd
+import streamlit as st
 
-# =====================================================
+from PIL import Image
+from PIL import ImageDraw
+
+# ==========================================
 # CONFIG
-# =====================================================
+# ==========================================
 
 NUM_ROUNDS = 10
 
 HUMAN_DIR = "dataset/human-made"
 AI_DIR = "dataset/ai-generated"
 
-SUPPORTED = (".jpg", ".jpeg", ".png")
+SUPPORTED_EXTENSIONS = (".jpg", ".jpeg", ".png")
 
-# =====================================================
-# LOAD DATASET
-# =====================================================
+# ==========================================
+# PLACEHOLDER DATASET GENERATION
+# ==========================================
+
+def create_placeholder_image(
+    filepath,
+    color,
+    text
+):
+    image = Image.new(
+        "RGB",
+        (512, 512),
+        color
+    )
+
+    draw = ImageDraw.Draw(image)
+
+    draw.text(
+        (50, 240),
+        text,
+        fill="black"
+    )
+
+    image.save(filepath)
+
+
+def generate_placeholder_dataset():
+
+    os.makedirs(HUMAN_DIR, exist_ok=True)
+    os.makedirs(AI_DIR, exist_ok=True)
+
+    human_files = os.listdir(HUMAN_DIR)
+    ai_files = os.listdir(AI_DIR)
+
+    if len(human_files) == 0:
+
+        for i in range(5):
+
+            create_placeholder_image(
+                os.path.join(
+                    HUMAN_DIR,
+                    f"human_{i}.png"
+                ),
+                (
+                    random.randint(100, 255),
+                    random.randint(100, 255),
+                    random.randint(100, 255)
+                ),
+                f"HUMAN {i}"
+            )
+
+    if len(ai_files) == 0:
+
+        for i in range(5):
+
+            create_placeholder_image(
+                os.path.join(
+                    AI_DIR,
+                    f"ai_{i}.png"
+                ),
+                (
+                    random.randint(0, 120),
+                    random.randint(0, 120),
+                    random.randint(0, 120)
+                ),
+                f"AI {i}"
+            )
+
+
+generate_placeholder_dataset()
+
+# ==========================================
+# LOAD DATA
+# ==========================================
 
 def load_dataset():
 
     images = []
 
-    for file in os.listdir(HUMAN_DIR):
-        if file.lower().endswith(SUPPORTED):
-            images.append(
-                {
-                    "path": os.path.join(HUMAN_DIR, file),
-                    "true_type": "Human-Made"
-                }
-            )
+    for filename in os.listdir(HUMAN_DIR):
 
-    for file in os.listdir(AI_DIR):
-        if file.lower().endswith(SUPPORTED):
-            images.append(
-                {
-                    "path": os.path.join(AI_DIR, file),
-                    "true_type": "AI-Generated"
-                }
-            )
+        if filename.lower().endswith(
+            SUPPORTED_EXTENSIONS
+        ):
+
+            images.append({
+                "path": os.path.join(
+                    HUMAN_DIR,
+                    filename
+                ),
+                "true_type": "Human-Made"
+            })
+
+    for filename in os.listdir(AI_DIR):
+
+        if filename.lower().endswith(
+            SUPPORTED_EXTENSIONS
+        ):
+
+            images.append({
+                "path": os.path.join(
+                    AI_DIR,
+                    filename
+                ),
+                "true_type": "AI-Generated"
+            })
 
     return images
 
 
-all_images = load_dataset()
+ALL_IMAGES = load_dataset()
 
-if len(all_images) < 2:
-    st.error("Need at least 2 images.")
-    st.stop()
-
-# =====================================================
+# ==========================================
 # SESSION STATE
-# =====================================================
+# ==========================================
 
 if "round" not in st.session_state:
     st.session_state.round = 1
@@ -61,42 +139,65 @@ if "round" not in st.session_state:
 if "results" not in st.session_state:
     st.session_state.results = []
 
-if "current_pair" not in st.session_state:
+# ==========================================
+# NEW ROUND
+# ==========================================
 
-    imgA, imgB = random.sample(all_images, 2)
+def generate_round():
 
-    st.session_state.current_pair = {
-        "A": imgA,
-        "B": imgB,
-        "label_A": random.choice(
-            ["Human-Made", "AI-Generated"]
-        ),
-        "label_B": random.choice(
-            ["Human-Made", "AI-Generated"]
-        )
+    image_a, image_b = random.sample(
+        ALL_IMAGES,
+        2
+    )
+
+    return {
+
+        "image_a": image_a,
+        "image_b": image_b,
+
+        "display_label_a":
+            random.choice([
+                "Human-Made",
+                "AI-Generated"
+            ]),
+
+        "display_label_b":
+            random.choice([
+                "Human-Made",
+                "AI-Generated"
+            ])
     }
 
-# =====================================================
+
+if "current_round" not in st.session_state:
+
+    st.session_state.current_round = (
+        generate_round()
+    )
+
+# ==========================================
 # FINISHED
-# =====================================================
+# ==========================================
 
 if st.session_state.round > NUM_ROUNDS:
 
     st.title("Experiment Complete")
 
-    df = pd.DataFrame(st.session_state.results)
-
-    correct = (
-        df["Guess_A_Correct"].sum() +
-        df["Guess_B_Correct"].sum()
+    df = pd.DataFrame(
+        st.session_state.results
     )
 
-    total = len(df) * 2
+    accuracy = (
 
-    accuracy = 100 * correct / total
+        df["guess_A_correct"].sum()
+        +
+        df["guess_B_correct"].sum()
+
+    ) / (len(df) * 2)
 
     st.success(
-        f"Classification Accuracy: {accuracy:.1f}%"
+        f"Classification Accuracy: "
+        f"{accuracy*100:.1f}%"
     )
 
     st.dataframe(df)
@@ -104,169 +205,165 @@ if st.session_state.round > NUM_ROUNDS:
     csv = df.to_csv(index=False)
 
     st.download_button(
-        label="Download Results CSV",
-        data=csv,
-        file_name="experiment_results.csv",
-        mime="text/csv"
+        "Download Results",
+        csv,
+        "results.csv",
+        "text/csv"
     )
 
     st.stop()
 
-# =====================================================
+# ==========================================
 # CURRENT ROUND
-# =====================================================
+# ==========================================
 
-pair = st.session_state.current_pair
-
-st.title("Human vs AI Image Study")
-
-st.subheader(
-    f"Round {st.session_state.round} of {NUM_ROUNDS}"
+round_data = (
+    st.session_state.current_round
 )
 
-# =====================================================
-# DISPLAY IMAGES
-# =====================================================
+st.title(
+    "Human vs AI Image Preference Study"
+)
+
+st.subheader(
+    f"Round {st.session_state.round}"
+    f" / {NUM_ROUNDS}"
+)
+
+# ==========================================
+# SHOW IMAGES
+# ==========================================
 
 col1, col2 = st.columns(2)
 
 with col1:
 
-    imageA = Image.open(pair["A"]["path"])
-
     st.image(
-        imageA,
+        round_data["image_a"]["path"],
         use_container_width=True
     )
 
     st.markdown(
-        f"### Image A\n"
-        f"Displayed Label: "
-        f"**{pair['label_A']}**"
+        f"""
+        **Image A**
+
+        Displayed Label:
+        {round_data['display_label_a']}
+        """
     )
 
 with col2:
 
-    imageB = Image.open(pair["B"]["path"])
-
     st.image(
-        imageB,
+        round_data["image_b"]["path"],
         use_container_width=True
     )
 
     st.markdown(
-        f"### Image B\n"
-        f"Displayed Label: "
-        f"**{pair['label_B']}**"
+        f"""
+        **Image B**
+
+        Displayed Label:
+        {round_data['display_label_b']}
+        """
     )
 
-st.divider()
-
-# =====================================================
-# USER INPUT
-# =====================================================
+# ==========================================
+# USER QUESTIONS
+# ==========================================
 
 preference = st.radio(
     "Which image do you prefer?",
-    ["Image A", "Image B"]
+    [
+        "Image A",
+        "Image B"
+    ]
 )
 
 guess_a = st.radio(
-    "What do you think Image A actually is?",
-    ["Human-Made", "AI-Generated"],
-    key="guessA"
+    "What is Image A?",
+    [
+        "Human-Made",
+        "AI-Generated"
+    ]
 )
 
 guess_b = st.radio(
-    "What do you think Image B actually is?",
-    ["Human-Made", "AI-Generated"],
-    key="guessB"
+    "What is Image B?",
+    [
+        "Human-Made",
+        "AI-Generated"
+    ],
+    key="guess_b"
 )
 
-# =====================================================
-# SUBMIT ROUND
-# =====================================================
+# ==========================================
+# SUBMIT
+# ==========================================
 
 if st.button("Submit Round"):
 
+    image_a = (
+        round_data["image_a"]
+    )
+
+    image_b = (
+        round_data["image_b"]
+    )
+
     st.session_state.results.append({
 
-        "Round":
+        "round":
             st.session_state.round,
 
-        "Image_A_Path":
-            pair["A"]["path"],
+        "image_A":
+            os.path.basename(
+                image_a["path"]
+            ),
 
-        "Image_A_Truth":
-            pair["A"]["true_type"],
+        "image_B":
+            os.path.basename(
+                image_b["path"]
+            ),
 
-        "Image_A_Displayed_Label":
-            pair["label_A"],
+        "true_A":
+            image_a["true_type"],
 
-        "Image_A_User_Guess":
+        "true_B":
+            image_b["true_type"],
+
+        "shown_label_A":
+            round_data[
+                "display_label_a"
+            ],
+
+        "shown_label_B":
+            round_data[
+                "display_label_b"
+            ],
+
+        "user_guess_A":
             guess_a,
 
-        "Guess_A_Correct":
-            guess_a ==
-            pair["A"]["true_type"],
-
-        "Label_A_Correct":
-            pair["label_A"] ==
-            pair["A"]["true_type"],
-
-        "Image_B_Path":
-            pair["B"]["path"],
-
-        "Image_B_Truth":
-            pair["B"]["true_type"],
-
-        "Image_B_Displayed_Label":
-            pair["label_B"],
-
-        "Image_B_User_Guess":
+        "user_guess_B":
             guess_b,
 
-        "Guess_B_Correct":
+        "guess_A_correct":
+            guess_a ==
+            image_a["true_type"],
+
+        "guess_B_correct":
             guess_b ==
-            pair["B"]["true_type"],
+            image_b["true_type"],
 
-        "Label_B_Correct":
-            pair["label_B"] ==
-            pair["B"]["true_type"],
-
-        "Preference":
+        "preference":
             preference
     })
 
     st.session_state.round += 1
 
-    if st.session_state.round <= NUM_ROUNDS:
-
-        imgA, imgB = random.sample(
-            all_images,
-            2
-        )
-
-        st.session_state.current_pair = {
-
-            "A": imgA,
-            "B": imgB,
-
-            "label_A":
-                random.choice(
-                    [
-                        "Human-Made",
-                        "AI-Generated"
-                    ]
-                ),
-
-            "label_B":
-                random.choice(
-                    [
-                        "Human-Made",
-                        "AI-Generated"
-                    ]
-                )
-        }
+    st.session_state.current_round = (
+        generate_round()
+    )
 
     st.rerun()
