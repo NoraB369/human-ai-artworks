@@ -200,17 +200,11 @@ if st.session_state.page == "intro":
 
     st.title("Human vs AI Image Preference Study")
 
-    st.markdown("---")
+    st.markdown("style='text-align: center;")
 
     st.header("Study Instructions")
 
     st.write("""
-    **PLACEHOLDER INSTRUCTIONS**
-
-    Thank you for participating in this study.
-
-    During this experiment you will view pairs of images.
-
     For each round:
 
     - Two images will be displayed.
