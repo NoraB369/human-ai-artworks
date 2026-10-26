@@ -6,10 +6,7 @@ import streamlit as st
 from PIL import Image
 from PIL import ImageDraw
 
-# ==========================================
-# CONFIG
-# ==========================================
-
+# CONFIGURATION
 NUM_ROUNDS = 10
 
 HUMAN_DIR = "dataset/human-made"
@@ -17,10 +14,7 @@ AI_DIR = "dataset/ai-generated"
 
 SUPPORTED_EXTENSIONS = (".jpg", ".jpeg", ".png")
 
-# ==========================================
-# PLACEHOLDER DATASET GENERATION
-# ==========================================
-
+# DATASET GENERATION
 def create_placeholder_image(
     filepath,
     color,
@@ -88,10 +82,7 @@ def generate_placeholder_dataset():
 
 generate_placeholder_dataset()
 
-# ==========================================
 # LOAD DATA
-# ==========================================
-
 def load_dataset():
 
     images = []
@@ -129,20 +120,14 @@ def load_dataset():
 
 ALL_IMAGES = load_dataset()
 
-# ==========================================
-# SESSION STATE
-# ==========================================
-
+# STUDY SESSION
 if "round" not in st.session_state:
     st.session_state.round = 1
 
 if "results" not in st.session_state:
     st.session_state.results = []
 
-# ==========================================
-# NEW ROUND
-# ==========================================
-
+# GENERATE ROUNDS
 def generate_round():
 
     image_a, image_b = random.sample(
@@ -175,10 +160,7 @@ if "current_round" not in st.session_state:
         generate_round()
     )
 
-# ==========================================
-# FINISHED
-# ==========================================
-
+# POST QUESTIONS
 if st.session_state.round > NUM_ROUNDS:
 
     st.title("Experiment Complete")
@@ -213,10 +195,7 @@ if st.session_state.round > NUM_ROUNDS:
 
     st.stop()
 
-# ==========================================
 # CURRENT ROUND
-# ==========================================
-
 round_data = (
     st.session_state.current_round
 )
@@ -230,10 +209,7 @@ st.subheader(
     f" / {NUM_ROUNDS}"
 )
 
-# ==========================================
 # SHOW IMAGES
-# ==========================================
-
 col1, col2 = st.columns(2)
 
 with col1:
@@ -268,10 +244,7 @@ with col2:
         """
     )
 
-# ==========================================
 # USER QUESTIONS
-# ==========================================
-
 preference = st.radio(
     "Which image do you prefer?",
     [
@@ -297,10 +270,8 @@ guess_b = st.radio(
     key="guess_b"
 )
 
-# ==========================================
-# SUBMIT
-# ==========================================
 
+# POST-STUDY DATA
 if st.button("Submit Round"):
 
     image_a = (
