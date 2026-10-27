@@ -360,7 +360,7 @@ if st.session_state.page == "experiment":
 # RESULTS PAGE
 if st.session_state.page == "results":
 
-    st.title("Study Complete")
+    st.title("Thank You For Participating!")
 
     st.markdown("---")
 
@@ -407,8 +407,6 @@ if st.session_state.page == "results":
     )
 
     st.markdown("---")
-
-    st.header("Thank You for participating!")
 
     if st.button(
         "Restart Study",
