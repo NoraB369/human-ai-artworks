@@ -184,26 +184,11 @@ if st.session_state.page == "intro":
     st.header("Study Instructions")
 
     st.write("""
-    For each round:
-
-    - Two images will be displayed.
-    - Each image will have a label indicating
-      whether it is supposedly Human-Made or
-      AI-Generated.
-    - These labels may be correct or incorrect.
-    - Review both images carefully.
-    - Select which image you prefer.
-    - Identify whether you believe each image
-      is Human-Made or AI-Generated.
-
-    The study consists of 10 rounds.
-
-    After completion you will be shown your
-    classification accuracy and may download
-    the results.
+    For each round, 2 images will be displayed and labeled either "Human-Made" or "AI-Generated;" these labels may be correct or incorrect.
+    Select which image you prefer, then identify whether you think each image is human-made or AI-generated.
 
     Click the button below when you are ready
-    to begin.
+    to begin!
     """)
 
     if st.button(
