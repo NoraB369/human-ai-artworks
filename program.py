@@ -130,12 +130,27 @@ def load_dataset():
 
 ALL_IMAGES = load_dataset()
 
+required_images = NUM_ROUNDS * 2
+
+if len(ALL_IMAGES) < required_images:
+
+    st.error(
+        f"This study requires at least "
+        f"{required_images} unique images.\n\n"
+        f"Found only {len(ALL_IMAGES)} images."
+    )
+
+    st.stop()
+
 # ROUND GENERATION
 def generate_round():
 
-    image_a, image_b = random.sample(
-        ALL_IMAGES,
-        2
+    image_a = (
+        st.session_state.image_pool.pop()
+    )
+
+    image_b = (
+        st.session_state.image_pool.pop()
     )
 
     return {
@@ -144,19 +159,21 @@ def generate_round():
 
         "image_b": image_b,
 
-        "display_label_a": random.choice(
-            [
-                "Human-Made",
-                "AI-Generated"
-            ]
-        ),
+        "display_label_a":
+            random.choice(
+                [
+                    "Human-Made",
+                    "AI-Generated"
+                ]
+            ),
 
-        "display_label_b": random.choice(
-            [
-                "Human-Made",
-                "AI-Generated"
-            ]
-        )
+        "display_label_b":
+            random.choice(
+                [
+                    "Human-Made",
+                    "AI-Generated"
+                ]
+            )
     }
 
 # SESSION STATE
@@ -169,7 +186,16 @@ if "round" not in st.session_state:
 if "results" not in st.session_state:
     st.session_state.results = []
 
+if "image_pool" not in st.session_state:
+
+    st.session_state.image_pool = ALL_IMAGES.copy()
+
+    random.shuffle(
+        st.session_state.image_pool
+    )
+
 if "current_round" not in st.session_state:
+
     st.session_state.current_round = (
         generate_round()
     )
@@ -406,12 +432,30 @@ if st.session_state.page == "results":
         "text/csv"
     )
 
-    st.markdown("---")
-
     if st.button(
         "Restart Study",
         use_container_width=True
     ):
+    
+        st.session_state.page = "intro"
+    
+        st.session_state.round = 1
+    
+        st.session_state.results = []
+    
+        st.session_state.image_pool = (
+            ALL_IMAGES.copy()
+        )
+    
+        random.shuffle(
+            st.session_state.image_pool
+        )
+    
+        st.session_state.current_round = (
+            generate_round()
+        )
+    
+        st.rerun()
 
         st.session_state.page = "intro"
         st.session_state.round = 1
