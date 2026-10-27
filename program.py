@@ -210,11 +210,10 @@ if st.session_state.page == "intro":
     st.header("Study Instructions")
 
     st.write("""
-    For each round, 2 images will be displayed and labeled either "Human-Made" or "AI-Generated;" these labels may be correct or incorrect.
-    Select which image you prefer, then identify whether you think each image is human-made or AI-generated.
+    For each round, 2 artworks will be displayed and labeled either "Human-Made" or "AI-Generated;" these labels may be correct or incorrect.
+    Select which artwork you prefer, then identify whether you think each artwork is human-made or AI-generated.
 
-    Click the button below when you are ready
-    to begin!
+    Click the button below when you are ready to begin!
     """)
 
     if st.button(
@@ -242,7 +241,7 @@ if st.session_state.page == "experiment":
     round_data = st.session_state.current_round
 
     st.title(
-        "Human vs AI Image Preference Study"
+        "Human vs AI Artwork Preference Study"
     )
 
     st.subheader(
