@@ -16,7 +16,7 @@ SUPPORTED_EXTENSIONS = (".jpg", ".jpeg", ".png")
 
 # PAGE CONFIGURATION
 st.set_page_config(
-    page_title="Human vs AI Image Study",
+    page_title="Human vs AI Artwork Study",
     layout="wide"
 )
 
@@ -203,7 +203,7 @@ if "current_round" not in st.session_state:
 # INTRODUCTION PAGE
 if st.session_state.page == "intro":
 
-    st.title("Human vs AI Image Preference Study")
+    st.title("Human vs AI Artwork Preference Study")
 
     st.markdown("---")
 
@@ -266,7 +266,7 @@ if st.session_state.page == "experiment":
 
         st.markdown(
             f"""
-            ### Image A
+            ### Artwork A
 
             Displayed Label:
             **{round_data['display_label_a']}**
@@ -282,7 +282,7 @@ if st.session_state.page == "experiment":
 
         st.markdown(
             f"""
-            ### Image B
+            ### Artwork B
 
             Displayed Label:
             **{round_data['display_label_b']}**
@@ -292,7 +292,7 @@ if st.session_state.page == "experiment":
     st.markdown("---")
 
     preference = st.radio(
-        "Which image do you prefer?",
+        "Which artwork do you prefer?",
         [
             "Image A",
             "Image B"
@@ -300,7 +300,7 @@ if st.session_state.page == "experiment":
     )
 
     guess_a = st.radio(
-        "What is Image A?",
+        "What is Artwork A?",
         [
             "Human-Made",
             "AI-Generated"
@@ -309,7 +309,7 @@ if st.session_state.page == "experiment":
     )
 
     guess_b = st.radio(
-        "What is Image B?",
+        "What is Artwork B?",
         [
             "Human-Made",
             "AI-Generated"
