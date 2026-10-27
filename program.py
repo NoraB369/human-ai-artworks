@@ -408,16 +408,7 @@ if st.session_state.page == "results":
 
     st.markdown("---")
 
-    st.header("Thank You")
-
-    st.write("""
-    Thank you for participating in this study.
-
-    Your responses have been recorded.
-
-    You may download the results above
-    or restart the study below.
-    """)
+    st.header("Thank You for participating!")
 
     if st.button(
         "Restart Study",
