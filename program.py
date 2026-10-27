@@ -6,10 +6,7 @@ import streamlit as st
 from PIL import Image
 from PIL import ImageDraw
 
-# =====================================================
 # CONFIGURATION
-# =====================================================
-
 NUM_ROUNDS = 10
 
 HUMAN_DIR = "dataset/human-made"
@@ -17,19 +14,13 @@ AI_DIR = "dataset/ai-generated"
 
 SUPPORTED_EXTENSIONS = (".jpg", ".jpeg", ".png")
 
-# =====================================================
-# PAGE CONFIG
-# =====================================================
-
+# PAGE CONFIGURATION
 st.set_page_config(
     page_title="Human vs AI Image Study",
     layout="wide"
 )
 
-# =====================================================
-# PLACEHOLDER DATASET GENERATION
-# =====================================================
-
+# DATASET GENERATION
 def create_placeholder_image(filepath, color, text):
 
     image = Image.new(
@@ -101,10 +92,7 @@ def generate_placeholder_dataset():
 
 generate_placeholder_dataset()
 
-# =====================================================
-# DATASET LOADING
-# =====================================================
-
+# LOAD DATASET
 def load_dataset():
 
     images = []
@@ -142,10 +130,7 @@ def load_dataset():
 
 ALL_IMAGES = load_dataset()
 
-# =====================================================
 # ROUND GENERATION
-# =====================================================
-
 def generate_round():
 
     image_a, image_b = random.sample(
@@ -174,10 +159,7 @@ def generate_round():
         )
     }
 
-# =====================================================
 # SESSION STATE
-# =====================================================
-
 if "page" not in st.session_state:
     st.session_state.page = "intro"
 
@@ -192,10 +174,7 @@ if "current_round" not in st.session_state:
         generate_round()
     )
 
-# =====================================================
-# INTRO PAGE
-# =====================================================
-
+# INTRODUCTION PAGE
 if st.session_state.page == "intro":
 
     st.title("Human vs AI Image Preference Study")
@@ -238,10 +217,7 @@ if st.session_state.page == "intro":
 
     st.stop()
 
-# =====================================================
-# START RESULTS PAGE WHEN FINISHED
-# =====================================================
-
+# START EXPERIMENT
 if (
     st.session_state.page == "experiment"
     and st.session_state.round > NUM_ROUNDS
@@ -249,10 +225,7 @@ if (
     st.session_state.page = "results"
     st.rerun()
 
-# =====================================================
 # EXPERIMENT PAGE
-# =====================================================
-
 if st.session_state.page == "experiment":
 
     round_data = st.session_state.current_round
@@ -399,10 +372,7 @@ if st.session_state.page == "experiment":
 
         st.rerun()
 
-# =====================================================
 # RESULTS PAGE
-# =====================================================
-
 if st.session_state.page == "results":
 
     st.title("Study Complete")
