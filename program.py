@@ -17,7 +17,7 @@ SUPPORTED_EXTENSIONS = (".jpg", ".jpeg", ".png")
 # PAGE CONFIGURATION
 st.set_page_config(
     page_title="Human vs AI Artwork Study",
-    layout="wide"
+    layout="centered"
 )
 
 # DATASET GENERATION
