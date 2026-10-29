@@ -203,7 +203,7 @@ if "current_round" not in st.session_state:
 # INTRODUCTION PAGE
 if st.session_state.page == "intro":
 
-    st.title("Human vs AI Artwork Preference Study")
+    st.title("Human vs AI Artwork Preference Study", text_alignment="center")
 
     st.markdown("---")
 
