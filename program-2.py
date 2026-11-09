@@ -2,6 +2,11 @@ import os
 import random
 import pandas as pd
 import streamlit as st
+import json
+import requests
+
+WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzFhfKVVRCVhbeS2gou4wC2mbHTYVCkA4p8WC6RUtgCuZSdGVZOJiKNQzdr1lDAom0bZA/exec"
+
 
 from PIL import Image
 from PIL import ImageDraw
@@ -464,6 +469,22 @@ if st.session_state.page == "experiment":
             "preferred_image":
                 preference
         })
+         # IF ALL QUESTIONS ARE FINISHED, PUSH THE WHOLE DATASET ONCE TO GOOGLE SHEETS
+        if st.session_state.round == NUM_ROUNDS:
+            try:
+                df_temp = pd.DataFrame(st.session_state.results)
+                total_correct = int(df_temp["guess_A_correct"].sum() + df_temp["guess_B_correct"].sum())
+                accuracy = float((total_correct / (NUM_ROUNDS * 2)) * 100)
+
+                payload = {
+                    "accuracy": accuracy,
+                    "total_correct": total_correct,
+                    "results": st.session_state.results
+                }
+                requests.post(WEB_APP_URL, json=payload)
+            except Exception as e:
+                pass
+
 
         st.session_state.round += 1
 
