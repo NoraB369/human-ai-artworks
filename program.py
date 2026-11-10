@@ -211,48 +211,9 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-
 # ---------------------------------------------------------
 # DATASET HELPERS
 # ---------------------------------------------------------
-def create_placeholder_image(filepath, color, text):
-    image = Image.new("RGB", (512, 512), color)
-    draw = ImageDraw.Draw(image)
-    draw.text((160, 240), text, fill="white")
-    image.save(filepath)
-
-
-def generate_placeholder_dataset():
-    os.makedirs(HUMAN_DIR, exist_ok=True)
-    os.makedirs(AI_DIR, exist_ok=True)
-
-    human_files = [
-        f for f in os.listdir(HUMAN_DIR) if f.lower().endswith(SUPPORTED_EXTENSIONS)
-    ]
-    ai_files = [
-        f for f in os.listdir(AI_DIR) if f.lower().endswith(SUPPORTED_EXTENSIONS)
-    ]
-
-    if len(human_files) == 0:
-        for i in range(10):
-            create_placeholder_image(
-                os.path.join(HUMAN_DIR, f"human_{i}.png"),
-                (random.randint(60, 140), random.randint(80, 160), 180),
-                f"HUMAN {i + 1}",
-            )
-
-    if len(ai_files) == 0:
-        for i in range(10):
-            create_placeholder_image(
-                os.path.join(AI_DIR, f"ai_{i}.png"),
-                (180, random.randint(60, 140), random.randint(80, 160)),
-                f"AI {i + 1}",
-            )
-
-
-generate_placeholder_dataset()
-
-
 def load_dataset():
     images = []
     for filename in os.listdir(HUMAN_DIR):
