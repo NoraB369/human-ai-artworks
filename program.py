@@ -309,6 +309,7 @@ def reset_session():
     st.session_state.page = "intro"
     st.session_state.round = 1
     st.session_state.results = []
+    st.session_state.pre_study = {}
     st.session_state.human_pool = human_images.copy()
     st.session_state.ai_pool = ai_images.copy()
     random.shuffle(st.session_state.human_pool)
@@ -346,12 +347,103 @@ if st.session_state.page == "intro":
 
     st.write("")
     if st.button("Begin Study →", type="primary", use_container_width=True):
-        st.session_state.page = "experiment"
+        st.session_state.page = "pre-study"
         st.rerun()
 
     st.stop()
 
+# ---------------------------------------------------------
+# 2. PRE-STUDY QUESTIONNAIRE
+# ---------------------------------------------------------
+if st.session_state.page == "pre_study":
+    st.markdown(
+        '<span class="meta-tag">Pre-Study Questionnaire</span>',
+        unsafe_allow_html=True
+    )
 
+    st.subheader("Before We Begin")
+    st.write(
+        "Please answer the following questions "
+        "before starting the artwork evaluation."
+    )
+    # ----------------------------------
+    # Multiple Choice Questions
+    # ----------------------------------
+    age_group = st.selectbox(
+        "Age Group",
+        [
+            "18-24",
+            "25-34",
+            "35-44",
+            "45-54",
+            "55-64",
+            "65+"
+        ]
+    )
+
+    gender = st.selectbox(
+        "Gender",
+        [
+            "Prefer not to say",
+            "Male",
+            "Female",
+            "Non-binary",
+            "Other"
+        ]
+    )
+
+    ai_familiarity = st.selectbox(
+        "How familiar are you with AI-generated artwork?",
+        [
+            "Not familiar",
+            "Slightly familiar",
+            "Moderately familiar",
+            "Very familiar",
+            "Expert"
+        ]
+    )
+    # ----------------------------------
+    # Likert Scale Example
+    # ----------------------------------
+    confidence = st.slider(
+        "How confident are you in your ability to identify AI-generated artwork?",
+        1,
+        5,
+        3,
+        help="1 = Not confident at all, 5 = Extremely confident"
+    )
+    # ----------------------------------
+    # Short Response Questions
+    # ----------------------------------
+    experience = st.text_area(
+        "Describe any prior experience with AI-generated art.",
+        height=120
+    )
+    strategy = st.text_area(
+        "What clues do you expect to use when identifying AI-generated artwork?",
+        height=120
+    )
+    # ----------------------------------
+    # Continue Button
+    # ----------------------------------
+    if st.button(
+        "Continue to Study →",
+        type="primary",
+        use_container_width=True
+    ):
+        st.session_state.pre_study = {
+            "age_group": age_group,
+            "gender": gender,
+            "ai_familiarity": ai_familiarity,
+            "confidence": confidence,
+            "experience": experience,
+            "strategy": strategy
+        }
+
+        st.session_state.page = "experiment"
+        st.rerun()
+    st.stop()
+    
 # ---------------------------------------------------------
 # 2. EXPERIMENT PAGE (RESPONSIVE SINGLE-VIEWPORT)
 # ---------------------------------------------------------
@@ -486,6 +578,7 @@ if st.session_state.page == "experiment":
                 )
                 accuracy = float((total_correct / (NUM_ROUNDS * 2)) * 100)
                 payload = {
+                    "pre_study": st.session_state.pre_study,
                     "accuracy": accuracy,
                     "total_correct": total_correct,
                     "results": st.session_state.results,
