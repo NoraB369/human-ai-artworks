@@ -346,7 +346,7 @@ if st.session_state.page == "intro":
     )
 
     st.write("")
-    if st.button("Begin Study →", type="primary", use_container_width=True):
+    if st.button("Begin Pre-Study Questions →", type="primary", use_container_width=True):
         st.session_state.page = "pre_study"
         st.rerun()
 
