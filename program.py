@@ -1,466 +1,540 @@
+import json
 import os
 import random
 import pandas as pd
+from PIL import Image, ImageDraw
+import requests
 import streamlit as st
 
-from PIL import Image
-from PIL import ImageDraw
+WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzFhfKVVRCVhbeS2gou4wC2mbHTYVCkA4p8WC6RUtgCuZSdGVZOJiKNQzdr1lDAom0bZA/exec"
 
-# CONFIGURATION
-NUM_ROUNDS = 10
-
+# ---------------------------------------------------------
+# CONFIGURATION & MATERIAL DESIGN 3 SETUP
+# ---------------------------------------------------------
+NUM_ROUNDS = 50
 HUMAN_DIR = "dataset/human-made"
 AI_DIR = "dataset/ai-generated"
-
 SUPPORTED_EXTENSIONS = (".jpg", ".jpeg", ".png")
 
-# PAGE CONFIGURATION
 st.set_page_config(
-    page_title="Human vs AI Artwork Study",
-    layout="centered"
+    page_title="Artwork Perception Study",
+    page_icon="🎨",
+    layout="centered",
+    initial_sidebar_state="collapsed",
 )
 
-# DATASET GENERATION
+# Material Design 3 Token Stylesheet with High Contrast Fixes
+st.markdown(
+    """
+    <style>
+    /* Reset Streamlit default header */
+    header[data-testid="stHeader"] {
+        height: 2rem !important;
+        background: transparent !important;
+    }
+    
+    /* M3 Surface Background */
+    .stApp {
+        background-color: #fef7ff !important;
+        font-family: "Roboto", system-ui, -apple-system, sans-serif !important;
+        color: #1d1b20 !important;
+    }
+
+    /* Container layout */
+    .block-container {
+        padding-top: 3.5rem !important;
+        padding-bottom: 4rem !important;
+        max-width: 960px !important;
+    }
+
+    /* Typography hierarchy */
+    p, span, label, div, h1, h2, h3, h4, h5, h6 {
+        color: #1d1b20 !important;
+        font-family: "Roboto", system-ui, -apple-system, sans-serif !important;
+    }
+
+    /* Remove default boxed borders */
+    [data-testid="stVerticalBlockBorderWrapper"] {
+        border: none !important;
+        box-shadow: none !important;
+        background: transparent !important;
+        padding: 0 !important;
+    }
+
+    /* Large artwork display with M3 Elevation */
+    [data-testid="stImage"] {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: 0.75rem;
+        margin-bottom: 1rem;
+    }
+    [data-testid="stImage"] img {
+        max-height: min(55vh, 480px) !important;
+        width: 100% !important;
+        object-fit: contain;
+        border-radius: 16px;
+        box-shadow: 0 4px 16px rgba(29, 27, 32, 0.08);
+    }
+
+    /* M3 Typography & Metadata Tokens */
+    .round-indicator {
+        font-size: 0.85rem;
+        font-weight: 500;
+        letter-spacing: 0.05em;
+        color: #49454f !important;
+        text-transform: uppercase;
+        margin-bottom: 0.25rem;
+    }
+    .card-title {
+        font-size: 1.25rem;
+        font-weight: 500;
+        letter-spacing: 0em;
+        color: #1d1b20 !important;
+        margin-bottom: 0.25rem;
+    }
+    .meta-tag {
+        display: inline-block;
+        font-size: 0.75rem;
+        font-weight: 500;
+        letter-spacing: 0.02em;
+        padding: 4px 12px;
+        border-radius: 8px;
+        background: #e8def8;
+        color: #1d192b !important;
+        margin-bottom: 0.5rem;
+    }
+
+    /* Material 3 Progress Bar */
+    .stProgress > div > div > div > div {
+        background-color: #6750a4 !important;
+        border-radius: 4px;
+    }
+    .stProgress > div > div > div {
+        background-color: #e7e0ec !important;
+        border-radius: 4px;
+    }
+
+    /* Primary Button (Next Round / Submit) - Solid Filled Purple */
+    div.stButton > button[kind="primary"] {
+        background-color: #6750a4 !important;
+        color: #ffffff !important;
+        border-radius: 20px !important;
+        height: 48px !important;
+        font-weight: 500 !important;
+        font-size: 0.95rem !important;
+        letter-spacing: 0.01em !important;
+        border: none !important;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15) !important;
+        transition: all 0.2s ease !important;
+        width: 100% !important;
+    }
+    div.stButton > button[kind="primary"]:hover {
+        background-color: #7965af !important;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2) !important;
+    }
+    div.stButton > button[kind="primary"] p, 
+    div.stButton > button[kind="primary"] span {
+        color: #ffffff !important;
+        font-size: 0.95rem !important;
+        font-weight: 500 !important;
+    }
+
+    /* Secondary Choice Buttons (Unselected/Selected Choice Chips) - Clear contrast */
+    div.stButton > button[kind="secondary"] {
+        background-color: #f3edf7 !important;
+        color: #1d1b20 !important;
+        border: 1px solid #cac4d0 !important;
+        border-radius: 20px !important;
+        height: 46px !important;
+        font-weight: 500 !important;
+        font-size: 0.95rem !important;
+        transition: all 0.2s ease !important;
+        width: 100% !important;
+        box-shadow: none !important;
+    }
+    div.stButton > button[kind="secondary"]:hover {
+        background-color: #e6e0eb !important;
+        border-color: #49454f !important;
+    }
+    div.stButton > button[kind="secondary"] p, 
+    div.stButton > button[kind="secondary"] span {
+        color: #1d1b20 !important;
+        font-size: 0.95rem !important;
+        font-weight: 500 !important;
+    }
+
+    /* Disabled state for Primary button */
+    div.stButton > button[kind="primary"]:disabled {
+        background-color: #1d1b201f !important;
+        color: #1d1b2061 !important;
+        box-shadow: none !important;
+    }
+    div.stButton > button[kind="primary"]:disabled p, 
+    div.stButton > button[kind="primary"]:disabled span {
+        color: #1d1b2061 !important;
+    }
+    </style>
+""",
+    unsafe_allow_html=True,
+)
+
+
+# ---------------------------------------------------------
+# DATASET HELPERS
+# ---------------------------------------------------------
 def create_placeholder_image(filepath, color, text):
-
-    image = Image.new(
-        "RGB",
-        (512, 512),
-        color
-    )
-
+    image = Image.new("RGB", (512, 512), color)
     draw = ImageDraw.Draw(image)
-
-    draw.text(
-        (150, 250),
-        text,
-        fill="black"
-    )
-
+    draw.text((160, 240), text, fill="white")
     image.save(filepath)
 
 
 def generate_placeholder_dataset():
-
     os.makedirs(HUMAN_DIR, exist_ok=True)
     os.makedirs(AI_DIR, exist_ok=True)
 
     human_files = [
-        f for f in os.listdir(HUMAN_DIR)
-        if f.lower().endswith(SUPPORTED_EXTENSIONS)
+        f for f in os.listdir(HUMAN_DIR) if f.lower().endswith(SUPPORTED_EXTENSIONS)
     ]
-
     ai_files = [
-        f for f in os.listdir(AI_DIR)
-        if f.lower().endswith(SUPPORTED_EXTENSIONS)
+        f for f in os.listdir(AI_DIR) if f.lower().endswith(SUPPORTED_EXTENSIONS)
     ]
 
     if len(human_files) == 0:
-
-        for i in range(5):
-
+        for i in range(10):
             create_placeholder_image(
-                os.path.join(
-                    HUMAN_DIR,
-                    f"human_{i}.png"
-                ),
-                (
-                    random.randint(150, 255),
-                    random.randint(150, 255),
-                    random.randint(150, 255)
-                ),
-                f"HUMAN {i + 1}"
+                os.path.join(HUMAN_DIR, f"human_{i}.png"),
+                (random.randint(60, 140), random.randint(80, 160), 180),
+                f"HUMAN {i + 1}",
             )
 
     if len(ai_files) == 0:
-
-        for i in range(5):
-
+        for i in range(10):
             create_placeholder_image(
-                os.path.join(
-                    AI_DIR,
-                    f"ai_{i}.png"
-                ),
-                (
-                    random.randint(0, 100),
-                    random.randint(0, 100),
-                    random.randint(0, 100)
-                ),
-                f"AI {i + 1}"
+                os.path.join(AI_DIR, f"ai_{i}.png"),
+                (180, random.randint(60, 140), random.randint(80, 160)),
+                f"AI {i + 1}",
             )
 
 
 generate_placeholder_dataset()
 
-# LOAD DATASET
+
 def load_dataset():
-
     images = []
-
     for filename in os.listdir(HUMAN_DIR):
-
-        if filename.lower().endswith(
-            SUPPORTED_EXTENSIONS
-        ):
-
-            images.append({
-                "path": os.path.join(
-                    HUMAN_DIR,
-                    filename
-                ),
-                "true_type": "Human-Made"
-            })
-
+        if filename.lower().endswith(SUPPORTED_EXTENSIONS):
+            images.append(
+                {
+                    "path": os.path.join(HUMAN_DIR, filename),
+                    "true_type": "Human-Made",
+                }
+            )
     for filename in os.listdir(AI_DIR):
-
-        if filename.lower().endswith(
-            SUPPORTED_EXTENSIONS
-        ):
-
-            images.append({
-                "path": os.path.join(
-                    AI_DIR,
-                    filename
-                ),
-                "true_type": "AI-Generated"
-            })
-
+        if filename.lower().endswith(SUPPORTED_EXTENSIONS):
+            images.append(
+                {"path": os.path.join(AI_DIR, filename), "true_type": "AI-Generated"}
+            )
     return images
 
 
+CONDITIONS = [
+    ("HXH", "correct"),
+    ("HXH", "wrong"),
+    ("HXH", "one_wrong"),
+    ("AXA", "correct"),
+    ("AXA", "wrong"),
+    ("AXA", "one_wrong"),
+    ("AXH", "correct"),
+    ("AXH", "wrong"),
+    ("AXH", "one_wrong"),
+    ("AXH", "one_wrong"),
+]
+
 ALL_IMAGES = load_dataset()
+human_images = [img for img in ALL_IMAGES if img["true_type"] == "Human-Made"]
+ai_images = [img for img in ALL_IMAGES if img["true_type"] == "AI-Generated"]
 
-required_images = NUM_ROUNDS * 2
-
-if len(ALL_IMAGES) < required_images:
-
-    st.error(
-        f"This study requires at least "
-        f"{required_images} unique images.\n\n"
-        f"Found only {len(ALL_IMAGES)} images."
-    )
-
+if len(human_images) < 10 or len(ai_images) < 10:
+    st.error("Insufficient images: minimum 10 human-made and 10 AI-generated images required.")
     st.stop()
 
-# ROUND GENERATION
+
+def opposite_label(label):
+    return "AI-Generated" if label == "Human-Made" else "Human-Made"
+
+
+def assign_labels(truth_a, truth_b, label_condition):
+    if label_condition == "correct":
+        return truth_a, truth_b
+    elif label_condition == "wrong":
+        return opposite_label(truth_a), opposite_label(truth_b)
+    else:
+        if random.choice([True, False]):
+            return opposite_label(truth_a), truth_b
+        return truth_a, opposite_label(truth_b)
+
+
 def generate_round():
+    pair_type, label_condition = st.session_state.conditions.pop()
 
-    image_a = (
-        st.session_state.image_pool.pop()
-    )
+    if pair_type == "HXH":
+        image_a = st.session_state.human_pool.pop()
+        image_b = st.session_state.human_pool.pop()
+    elif pair_type == "AXA":
+        image_a = st.session_state.ai_pool.pop()
+        image_b = st.session_state.ai_pool.pop()
+    else:
+        image_a = st.session_state.ai_pool.pop()
+        image_b = st.session_state.human_pool.pop()
+        if random.choice([True, False]):
+            image_a, image_b = image_b, image_a
 
-    image_b = (
-        st.session_state.image_pool.pop()
+    label_a, label_b = assign_labels(
+        image_a["true_type"], image_b["true_type"], label_condition
     )
 
     return {
-
+        "condition": pair_type,
+        "label_condition": label_condition,
         "image_a": image_a,
-
         "image_b": image_b,
-
-        "display_label_a":
-            random.choice(
-                [
-                    "Human-Made",
-                    "AI-Generated"
-                ]
-            ),
-
-        "display_label_b":
-            random.choice(
-                [
-                    "Human-Made",
-                    "AI-Generated"
-                ]
-            )
+        "display_label_a": label_a,
+        "display_label_b": label_b,
     }
 
-# SESSION STATE
-if "page" not in st.session_state:
+
+def reset_session():
     st.session_state.page = "intro"
-
-if "round" not in st.session_state:
     st.session_state.round = 1
-
-if "results" not in st.session_state:
     st.session_state.results = []
+    st.session_state.human_pool = human_images.copy()
+    st.session_state.ai_pool = ai_images.copy()
+    random.shuffle(st.session_state.human_pool)
+    random.shuffle(st.session_state.ai_pool)
+    st.session_state.conditions = CONDITIONS.copy()
+    random.shuffle(st.session_state.conditions)
+    st.session_state.current_round = generate_round()
 
-if "image_pool" not in st.session_state:
 
-    st.session_state.image_pool = ALL_IMAGES.copy()
+# ---------------------------------------------------------
+# STATE INITIALIZATION
+# ---------------------------------------------------------
+if "page" not in st.session_state:
+    reset_session()
 
-    random.shuffle(
-        st.session_state.image_pool
-    )
 
-if "current_round" not in st.session_state:
-
-    st.session_state.current_round = (
-        generate_round()
-    )
-
-# INTRODUCTION PAGE
+# ---------------------------------------------------------
+# 1. INTRO PAGE
+# ---------------------------------------------------------
 if st.session_state.page == "intro":
+    st.markdown('<span class="meta-tag">Research Study</span>', unsafe_allow_html=True)
+    st.subheader("Human vs. AI Artwork Perception")
+    st.write(
+        "This study investigates visual art perception, preference, and attribution across "
+        f"**{NUM_ROUNDS} image pairs**."
+    )
 
-    st.title("Human vs AI Artwork Preference Study", text_alignment="center")
+    st.markdown(
+        """
+- **Examine**: Compare the two artworks and review their catalog labels.
+- **Evaluate**: Classify whether each is truly Human-Made or AI-Generated.
+- **Decide**: Select the artwork you personally prefer.
+        """
+    )
 
-    st.markdown("---")
-
-    st.header("Study Instructions")
-
-    st.write("""
-    For each round, 2 artworks will be displayed and labeled either "Human-Made" or "AI-Generated;" these labels may be correct or incorrect.
-    Select which artwork you prefer, then identify whether you think each artwork is human-made or AI-generated.
-
-    Click the button below when you are ready to begin!
-    """)
-
-    if st.button(
-        "Start Study",
-        use_container_width=True
-    ):
-
+    st.write("")
+    if st.button("Begin Study →", type="primary", use_container_width=True):
         st.session_state.page = "experiment"
-
         st.rerun()
 
     st.stop()
 
-# START EXPERIMENT
-if (
-    st.session_state.page == "experiment"
-    and st.session_state.round > NUM_ROUNDS
-):
-    st.session_state.page = "results"
-    st.rerun()
 
-# EXPERIMENT PAGE
+# ---------------------------------------------------------
+# 2. EXPERIMENT PAGE (RESPONSIVE SINGLE-VIEWPORT)
+# ---------------------------------------------------------
 if st.session_state.page == "experiment":
+    if st.session_state.round > NUM_ROUNDS:
+        st.session_state.page = "results"
+        st.rerun()
 
     round_data = st.session_state.current_round
 
-    st.title(
-        "Human vs AI Artwork Preference Study"
+    st.markdown(
+        f'<div class="round-indicator">Round {st.session_state.round} of {NUM_ROUNDS}</div>',
+        unsafe_allow_html=True,
     )
+    st.progress(st.session_state.round / NUM_ROUNDS)
+    st.write("")
 
-    st.subheader(
-        f"Round {st.session_state.round} of {NUM_ROUNDS}"
-    )
+    # State keys for current round
+    guess_a_key = f"guess_a_{st.session_state.round}"
+    guess_b_key = f"guess_b_{st.session_state.round}"
+    pref_key = f"pref_{st.session_state.round}"
 
-    st.progress(
-        st.session_state.round / NUM_ROUNDS
-    )
+    # Side-by-side artwork evaluation
+    col_a, col_b = st.columns(2, gap="large")
 
-    st.markdown("---")
-
-    col1, col2 = st.columns(2)
-
-    with col1:
-
-        st.image(
-            round_data["image_a"]["path"],
-            use_container_width=True
-        )
-
+    with col_a:
+        st.markdown('<div class="card-title">Artwork A</div>', unsafe_allow_html=True)
         st.markdown(
-            f"""
-            ### Artwork A
-
-            Displayed Label:
-            **{round_data['display_label_a']}**
-            """
+            f'<span class="meta-tag">Catalog: {round_data["display_label_a"]}</span>',
+            unsafe_allow_html=True,
         )
+        st.image(round_data["image_a"]["path"], use_container_width=True)
+        
+        st.markdown('<p style="font-size: 0.875rem; font-weight: 500; color: #49454f; margin-bottom: 0.4rem;">Artwork A is:</p>', unsafe_allow_html=True)
+        current_guess_a = st.session_state.get(guess_a_key)
+        
+        ga_col1, ga_col2 = st.columns(2)
+        with ga_col1:
+            if st.button("Human-Made", key=f"btn_ga_h_{st.session_state.round}", use_container_width=True, type="primary" if current_guess_a == "Human-Made" else "secondary"):
+                st.session_state[guess_a_key] = "Human-Made"
+                st.rerun()
+        with ga_col2:
+            if st.button("AI-Generated", key=f"btn_ga_ai_{st.session_state.round}", use_container_width=True, type="primary" if current_guess_a == "AI-Generated" else "secondary"):
+                st.session_state[guess_a_key] = "AI-Generated"
+                st.rerun()
 
-    with col2:
-
-        st.image(
-            round_data["image_b"]["path"],
-            use_container_width=True
-        )
-
+    with col_b:
+        st.markdown('<div class="card-title">Artwork B</div>', unsafe_allow_html=True)
         st.markdown(
-            f"""
-            ### Artwork B
+            f'<span class="meta-tag">Catalog: {round_data["display_label_b"]}</span>',
+            unsafe_allow_html=True,
+        )
+        st.image(round_data["image_b"]["path"], use_container_width=True)
+        
+        st.markdown('<p style="font-size: 0.875rem; font-weight: 500; color: #49454f; margin-bottom: 0.4rem;">Artwork B is:</p>', unsafe_allow_html=True)
+        current_guess_b = st.session_state.get(guess_b_key)
+        
+        gb_col1, gb_col2 = st.columns(2)
+        with gb_col1:
+            if st.button("Human-Made", key=f"btn_gb_h_{st.session_state.round}", use_container_width=True, type="primary" if current_guess_b == "Human-Made" else "secondary"):
+                st.session_state[guess_b_key] = "Human-Made"
+                st.rerun()
+        with gb_col2:
+            if st.button("AI-Generated", key=f"btn_gb_ai_{st.session_state.round}", use_container_width=True, type="primary" if current_guess_b == "AI-Generated" else "secondary"):
+                st.session_state[guess_b_key] = "AI-Generated"
+                st.rerun()
 
-            Displayed Label:
-            **{round_data['display_label_b']}**
-            """
+    st.write("")
+    st.write("---")
+
+    # Preference selection & submission bar
+    pref_col, btn_col = st.columns([1.3, 1], gap="medium", vertical_alignment="center")
+
+    with pref_col:
+        st.markdown('<p style="font-size: 0.875rem; font-weight: 500; color: #49454f; margin-bottom: 0.4rem;">Preferred Artwork:</p>', unsafe_allow_html=True)
+        current_pref = st.session_state.get(pref_key)
+        
+        p_col1, p_col2 = st.columns(2)
+        with p_col1:
+            if st.button("Artwork A", key=f"btn_pref_a_{st.session_state.round}", use_container_width=True, type="primary" if current_pref == "Artwork A" else "secondary"):
+                st.session_state[pref_key] = "Artwork A"
+                st.rerun()
+        with p_col2:
+            if st.button("Artwork B", key=f"btn_pref_b_{st.session_state.round}", use_container_width=True, type="primary" if current_pref == "Artwork B" else "secondary"):
+                st.session_state[pref_key] = "Artwork B"
+                st.rerun()
+
+    # Check if all questions on this page are completed
+    current_guess_a = st.session_state.get(guess_a_key)
+    current_guess_b = st.session_state.get(guess_b_key)
+    current_pref = st.session_state.get(pref_key)
+    all_answered = (current_guess_a is not None) and (current_guess_b is not None) and (current_pref is not None)
+
+    with btn_col:
+        st.write("")
+        submit_btn = st.button(
+            "Next Round →" if st.session_state.round < NUM_ROUNDS else "Submit & Finish →",
+            type="primary",
+            use_container_width=True,
+            disabled=not all_answered,
+            key=f"submit_{st.session_state.round}"
         )
 
-    st.markdown("---")
-
-    preference = st.radio(
-        "Which artwork do you prefer?",
-        [
-            "Image A",
-            "Image B"
-        ]
-    )
-
-    guess_a = st.radio(
-        "What is Artwork A?",
-        [
-            "Human-Made",
-            "AI-Generated"
-        ],
-        key=f"guess_a_{st.session_state.round}"
-    )
-
-    guess_b = st.radio(
-        "What is Artwork B?",
-        [
-            "Human-Made",
-            "AI-Generated"
-        ],
-        key=f"guess_b_{st.session_state.round}"
-    )
-
-    if st.button(
-        "Submit Round",
-        use_container_width=True
-    ):
-
+    if submit_btn and all_answered:
         image_a = round_data["image_a"]
         image_b = round_data["image_b"]
 
-        st.session_state.results.append({
+        st.session_state.results.append(
+            {
+                "round": st.session_state.round,
+                "condition": round_data["condition"],
+                "label_condition": round_data["label_condition"],
+                "image_A": os.path.basename(image_a["path"]),
+                "image_B": os.path.basename(image_b["path"]),
+                "true_type_A": image_a["true_type"],
+                "true_type_B": image_b["true_type"],
+                "displayed_label_A": round_data["display_label_a"],
+                "displayed_label_B": round_data["display_label_b"],
+                "user_guess_A": current_guess_a,
+                "user_guess_B": current_guess_b,
+                "guess_A_correct": current_guess_a == image_a["true_type"],
+                "guess_B_correct": current_guess_b == image_b["true_type"],
+                "preferred_image": current_pref,
+            }
+        )
 
-            "round":
-                st.session_state.round,
-
-            "image_A":
-                os.path.basename(
-                    image_a["path"]
-                ),
-
-            "image_B":
-                os.path.basename(
-                    image_b["path"]
-                ),
-
-            "true_type_A":
-                image_a["true_type"],
-
-            "true_type_B":
-                image_b["true_type"],
-
-            "displayed_label_A":
-                round_data[
-                    "display_label_a"
-                ],
-
-            "displayed_label_B":
-                round_data[
-                    "display_label_b"
-                ],
-
-            "user_guess_A":
-                guess_a,
-
-            "user_guess_B":
-                guess_b,
-
-            "guess_A_correct":
-                guess_a ==
-                image_a["true_type"],
-
-            "guess_B_correct":
-                guess_b ==
-                image_b["true_type"],
-
-            "preferred_image":
-                preference
-
-        })
+        if st.session_state.round == NUM_ROUNDS:
+            try:
+                df_temp = pd.DataFrame(st.session_state.results)
+                total_correct = int(
+                    df_temp["guess_A_correct"].sum() + df_temp["guess_B_correct"].sum()
+                )
+                accuracy = float((total_correct / (NUM_ROUNDS * 2)) * 100)
+                payload = {
+                    "accuracy": accuracy,
+                    "total_correct": total_correct,
+                    "results": st.session_state.results,
+                }
+                requests.post(WEB_APP_URL, json=payload, timeout=5)
+            except Exception:
+                pass
 
         st.session_state.round += 1
-
-        st.session_state.current_round = (
-            generate_round()
-        )
-
+        if st.session_state.round <= NUM_ROUNDS:
+            st.session_state.current_round = generate_round()
         st.rerun()
 
-# RESULTS PAGE
+
+# ---------------------------------------------------------
+# 3. RESULTS PAGE
+# ---------------------------------------------------------
 if st.session_state.page == "results":
+    st.markdown('<span class="meta-tag">Study Complete</span>', unsafe_allow_html=True)
+    st.subheader("Thank you for participating!")
+    st.write("Your classifications and preferences have been securely recorded.")
+    st.write("")
 
-    st.title("Thank You For Participating!")
-
-    st.markdown("---")
-
-    df = pd.DataFrame(
-        st.session_state.results
-    )
-
-    total_correct = (
-
-        df["guess_A_correct"].sum()
-        +
-        df["guess_B_correct"].sum()
-
-    )
-
+    df = pd.DataFrame(st.session_state.results)
+    total_correct = int(df["guess_A_correct"].sum() + df["guess_B_correct"].sum())
     total_predictions = len(df) * 2
+    accuracy = (total_correct / total_predictions) * 100
 
-    accuracy = (
-        total_correct /
-        total_predictions
-    ) * 100
+    m1, m2, m3 = st.columns(3)
+    m1.metric("Accuracy", f"{accuracy:.1f}%")
+    m2.metric("Correct Guesses", f"{total_correct}/{total_predictions}")
+    m3.metric("Rounds Evaluated", NUM_ROUNDS)
 
-    st.success(
-        f"Classification Accuracy: "
-        f"{accuracy:.1f}%"
-    )
+    st.write("")
+    with st.expander("Inspect Detailed Session Data", expanded=False):
+        st.dataframe(df, use_container_width=True, hide_index=True)
 
-    st.subheader("Results")
-
-    st.dataframe(
-        df,
-        use_container_width=True
-    )
-
-    csv = df.to_csv(
-        index=False
-    )
-
-    st.download_button(
-        "Download Results CSV",
-        csv,
-        "results.csv",
-        "text/csv"
-    )
-
-    if st.button(
-        "Restart Study",
-        use_container_width=True
-    ):
-    
-        st.session_state.page = "intro"
-    
-        st.session_state.round = 1
-    
-        st.session_state.results = []
-    
-        st.session_state.image_pool = (
-            ALL_IMAGES.copy()
+    st.write("")
+    c1, c2 = st.columns(2)
+    with c1:
+        csv = df.to_csv(index=False)
+        st.download_button(
+            "Download Data (CSV)",
+            csv,
+            "artwork_study_results.csv",
+            "text/csv",
+            use_container_width=True,
         )
-    
-        random.shuffle(
-            st.session_state.image_pool
-        )
-    
-        st.session_state.current_round = (
-            generate_round()
-        )
-    
-        st.rerun()
-
-        st.session_state.page = "intro"
-        st.session_state.round = 1
-        st.session_state.results = []
-        st.session_state.current_round = (
-            generate_round()
-        )
-
-        st.rerun()
+    with c2:
+        if st.button("Start New Session", use_container_width=True):
+            reset_session()
+            st.rerun()
