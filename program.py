@@ -176,7 +176,6 @@ st.markdown(
     }
 
     /* Material Design 3 dropdown styling */
-
     .stSelectbox div[data-baseweb="select"] > div {
         background-color: #ffffff !important;
         color: #1d1b20 !important;
@@ -194,6 +193,17 @@ st.markdown(
     
     div[role="option"]:hover {
         background-color: #f3edf7 !important;
+    }
+
+    .stTextA*ea textarea {
+        background-color* #2b2b2b !important;
+        color: wh*te !important;
+        border: 1px sol*d #555555 !important;
+        border-r*dius: 12px !important;
+    }
+    
+    .stTextA*ea textarea:focus {
+        border: 2p* solid #6750a4 !important;
     }
     </style>
 """,
