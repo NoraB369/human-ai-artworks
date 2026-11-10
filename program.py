@@ -175,38 +175,25 @@ st.markdown(
         color: #1d1b2061 !important;
     }
 
-    /* Selectbox selected value */
+    /* Material Design 3 dropdown styling */
+
     .stSelectbox div[data-baseweb="select"] > div {
-        color: #ffffff !important;
-        background-color: #2b2b2b !important;
+        background-color: #ffffff !important;
+        color: #1d1b20 !important;
+        border: 1px solid #cac4d0 !important;
     }
     
-    /* Dropdown menu container */
     div[role="listbox"] {
-        background-color: #2b2b2b !important;
+        background-color: #ffffff !important;
     }
     
-    /* Dropdown options */
     div[role="option"] {
-        color: #ffffff !important;
-        background-color: #2b2b2b !important;
+        color: #1d1b20 !important;
+        background-color: #ffffff !important;
     }
     
-    /* Hovered option */
     div[role="option"]:hover {
-        background-color: #444444 !important;
-    }
-    
-    /* Text area */
-    .stTextArea textarea {
-        color: #1d1b20 !important;
-        background-color: white !important;
-    }
-    
-    /* Text input */
-    .stTextInput input {
-        color: #1d1b20 !important;
-        background-color: white !important;
+        background-color: #f3edf7 !important;
     }
     </style>
 """,
