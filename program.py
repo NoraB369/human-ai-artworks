@@ -174,6 +174,40 @@ st.markdown(
     div.stButton > button[kind="primary"]:disabled span {
         color: #1d1b2061 !important;
     }
+
+    /* Selectbox selected value */
+    .stSelectbox div[data-baseweb="select"] > div {
+        color: #ffffff !important;
+        background-color: #2b2b2b !important;
+    }
+    
+    /* Dropdown menu container */
+    div[role="listbox"] {
+        background-color: #2b2b2b !important;
+    }
+    
+    /* Dropdown options */
+    div[role="option"] {
+        color: #ffffff !important;
+        background-color: #2b2b2b !important;
+    }
+    
+    /* Hovered option */
+    div[role="option"]:hover {
+        background-color: #444444 !important;
+    }
+    
+    /* Text area */
+    .stTextArea textarea {
+        color: #1d1b20 !important;
+        background-color: white !important;
+    }
+    
+    /* Text input */
+    .stTextInput input {
+        color: #1d1b20 !important;
+        background-color: white !important;
+    }
     </style>
 """,
     unsafe_allow_html=True,
