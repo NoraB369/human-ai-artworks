@@ -231,7 +231,7 @@ def load_dataset():
             )
     return images
 
-CONDITIONS = [
+BASE_CONDITIONS = [
     ("HXH", "correct"),
     ("HXH", "wrong"),
     ("HXH", "one_wrong"),
@@ -243,6 +243,13 @@ CONDITIONS = [
     ("AXH", "one_wrong"),
     ("AXH", "one_wrong"),
 ]
+
+CONDITIONS = []
+
+for _ in range(NUM_ROUNDS // len(BASE_CONDITIONS)):
+    CONDITIONS.extend(BASE_CONDITIONS)
+
+random.shuffle(CONDITIONS)
 
 ALL_IMAGES = load_dataset()
 human_images = [img for img in ALL_IMAGES if img["true_type"] == "Human-Made"]
