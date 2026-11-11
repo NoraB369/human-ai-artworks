@@ -851,7 +851,7 @@ if st.session_state.page == "experiment":
                     "total_correct": total_correct,
                     "results": st.session_state.results,
                 }
-                requests.post(WEB_APP_URL, json=payload, timeout=15)
+                requests.post(WEB_APP_URL, json=payload, timeout=5)
             except Exception:
                 pass
 
