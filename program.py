@@ -853,8 +853,8 @@ if st.session_state.page == "experiment":
                 }
 
                 requests.post(WEB_APP_URL, json=payload, timeout=5)
-            #except Exception:
-                #pass
+            except Exception:
+                pass
 
         st.session_state.round += 1
         if st.session_state.round <= NUM_ROUNDS:
