@@ -638,13 +638,46 @@ if st.session_state.page == "pre_study":
         "How accurate do you think you will be in selecting the AI-generated image? (0%-100% scale)",
         height=50
     )
+
+    # ----------------------------------
+    # Check if all questions are answered
+    # ----------------------------------
+    all_answered = (
+        age.strip() != ""
+        and gender.strip() != ""
+        and major.strip() != ""
+        and attitude_1 is not None
+        and attitude_2 is not None
+        and attitude_3 is not None
+        and attitude_4 is not None
+        and attitude_5 is not None
+        and attitude_6 is not None
+        and attitude_7 is not None
+        and attitude_8 is not None
+        and attitude_9 is not None
+        and attitude_10 is not None
+        and attitude_11 is not None
+        and attitude_12 is not None
+        and attitude_13 is not None
+        and attitude_14 is not None
+        and attitude_15 is not None
+        and attitude_16 is not None
+        and attitude_17 is not None
+        and attitude_18 is not None
+        and attitude_19 is not None
+        and attitude_20 is not None
+        and attitude_21 is not None
+        and age.strip() != ""
+        and accuracy.strip() != ""
+    )
     # ----------------------------------
     # Continue Button
     # ----------------------------------
     if st.button(
         "Continue to Study →",
         type="primary",
-        use_container_width=True
+        use_container_width=True,
+        disabled=not all_answered
     ):
         st.session_state.pre_study = {
             "age": age,
