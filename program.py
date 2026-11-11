@@ -378,8 +378,8 @@ if st.session_state.page == "pre_study":
             "Neutral",
             "Disagree",
             "Strongly disagree",
-            index=None,
         ]
+        index=None,
     )
 
     attitude_2 = st.selectbox(
@@ -390,8 +390,8 @@ if st.session_state.page == "pre_study":
             "Neutral",
             "Disagree",
             "Strongly disagree",
-            index=None,
         ]
+        index=None,
     )
 
     attitude_3 = st.selectbox(
@@ -402,8 +402,8 @@ if st.session_state.page == "pre_study":
             "Neutral",
             "Disagree",
             "Strongly disagree",
-            index=None,
         ]
+        index=None,
     )
 
     attitude_4 = st.selectbox(
@@ -414,8 +414,8 @@ if st.session_state.page == "pre_study":
             "Neutral",
             "Disagree",
             "Strongly disagree",
-            index=None,
         ]
+        index=None,
     )
 
     attitude_5 = st.selectbox(
@@ -426,8 +426,8 @@ if st.session_state.page == "pre_study":
             "Neutral",
             "Disagree",
             "Strongly disagree",
-            index=None,
         ]
+        index=None,
     )
 
     attitude_6 = st.selectbox(
@@ -438,8 +438,8 @@ if st.session_state.page == "pre_study":
             "Neutral",
             "Disagree",
             "Strongly disagree",
-            index=None,
         ]
+        index=None,
     )
 
     attitude_7 = st.selectbox(
@@ -450,8 +450,8 @@ if st.session_state.page == "pre_study":
             "Neutral",
             "Disagree",
             "Strongly disagree",
-            index=None,
         ]
+        index=None,
     )
 
     attitude_8 = st.selectbox(
@@ -462,8 +462,8 @@ if st.session_state.page == "pre_study":
             "Neutral",
             "Disagree",
             "Strongly disagree",
-            index=None,
         ]
+        index=None,
     )
 
     attitude_9 = st.selectbox(
@@ -474,8 +474,8 @@ if st.session_state.page == "pre_study":
             "Neutral",
             "Disagree",
             "Strongly disagree",
-            index=None,
         ]
+        index=None,
     )
 
     attitude_10 = st.selectbox(
@@ -486,8 +486,8 @@ if st.session_state.page == "pre_study":
             "Neutral",
             "Disagree",
             "Strongly disagree",
-            index=None,
         ]
+        index=None,
     )
 
     attitude_11 = st.selectbox(
@@ -498,8 +498,8 @@ if st.session_state.page == "pre_study":
             "Neutral",
             "Disagree",
             "Strongly disagree",
-            index=None,
         ]
+        index=None,
     )
 
     attitude_12 = st.selectbox(
@@ -510,8 +510,8 @@ if st.session_state.page == "pre_study":
             "Neutral",
             "Disagree",
             "Strongly disagree",
-            index=None,
         ]
+        index=None,
     )
 
     attitude_13 = st.selectbox(
@@ -522,8 +522,8 @@ if st.session_state.page == "pre_study":
             "Neutral",
             "Disagree",
             "Strongly disagree",
-            index=None,
         ]
+        index=None,
     )
 
     attitude_14 = st.selectbox(
@@ -534,8 +534,8 @@ if st.session_state.page == "pre_study":
             "Neutral",
             "Disagree",
             "Strongly disagree",
-            index=None,
         ]
+        index=None,
     )
 
     attitude_15 = st.selectbox(
@@ -546,8 +546,8 @@ if st.session_state.page == "pre_study":
             "Neutral",
             "Disagree",
             "Strongly disagree",
-            index=None,
         ]
+        index=None,
     )
 
     attitude_16 = st.selectbox(
@@ -558,8 +558,8 @@ if st.session_state.page == "pre_study":
             "Neutral",
             "Disagree",
             "Strongly disagree",
-            index=None,
         ]
+        index=None,
     )
 
     attitude_17 = st.selectbox(
@@ -570,8 +570,8 @@ if st.session_state.page == "pre_study":
             "Neutral",
             "Disagree",
             "Strongly disagree",
-            index=None,
         ]
+        index=None,
     )
 
     attitude_18 = st.selectbox(
@@ -582,8 +582,8 @@ if st.session_state.page == "pre_study":
             "Neutral",
             "Disagree",
             "Strongly disagree",
-            index=None,
         ]
+        index=None,
     )
 
     attitude_19 = st.selectbox(
@@ -594,8 +594,8 @@ if st.session_state.page == "pre_study":
             "Neutral",
             "Disagree",
             "Strongly disagree",
-            index=None,
         ]
+        index=None,
     )
 
     attitude_20 = st.selectbox(
@@ -606,8 +606,8 @@ if st.session_state.page == "pre_study":
             "Neutral",
             "Disagree",
             "Strongly disagree",
-            index=None,
         ]
+        index=None,
     )
 
     attitude_21 = st.selectbox(
@@ -618,8 +618,8 @@ if st.session_state.page == "pre_study":
             "Neutral",
             "Disagree",
             "Strongly disagree",
-            index=None,
         ]
+        index=None,
     )
     # ----------------------------------
     # Likert Scale
