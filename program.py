@@ -852,11 +852,7 @@ if st.session_state.page == "experiment":
                     "results": st.session_state.results,
                 }
 
-                st.write("PRE STUDY DATA:")
-                st.json(st.session_state.pre_study)
-                
-                st.write("PAYLOAD:")
-                st.json(payload)
+                print(json.dumps(payload, indent=2))
 
                 requests.post(WEB_APP_URL, json=payload, timeout=5)
             except Exception:
