@@ -11,7 +11,7 @@ WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzFhfKVVRCVhbeS2gou4wC2mb
 # ---------------------------------------------------------
 # CONFIGURATION & MATERIAL DESIGN 3 SETUP
 # ---------------------------------------------------------
-NUM_ROUNDS = 50
+NUM_ROUNDS = 5
 HUMAN_DIR = "dataset/human-made"
 AI_DIR = "dataset/ai-generated"
 SUPPORTED_EXTENSIONS = (".jpg", ".jpeg", ".png")
@@ -231,7 +231,6 @@ def load_dataset():
             )
     return images
 
-
 CONDITIONS = [
     ("HXH", "correct"),
     ("HXH", "wrong"),
@@ -253,10 +252,8 @@ if len(human_images) < 10 or len(ai_images) < 10:
     st.error("Insufficient images: minimum 10 human-made and 10 AI-generated images required.")
     st.stop()
 
-
 def opposite_label(label):
     return "AI-Generated" if label == "Human-Made" else "Human-Made"
-
 
 def assign_labels(truth_a, truth_b, label_condition):
     if label_condition == "correct":
@@ -267,7 +264,6 @@ def assign_labels(truth_a, truth_b, label_condition):
         if random.choice([True, False]):
             return opposite_label(truth_a), truth_b
         return truth_a, opposite_label(truth_b)
-
 
 def generate_round():
     pair_type, label_condition = st.session_state.conditions.pop()
@@ -287,7 +283,6 @@ def generate_round():
     label_a, label_b = assign_labels(
         image_a["true_type"], image_b["true_type"], label_condition
     )
-
     return {
         "condition": pair_type,
         "label_condition": label_condition,
@@ -296,7 +291,6 @@ def generate_round():
         "display_label_a": label_a,
         "display_label_b": label_b,
     }
-
 
 def reset_session():
     st.session_state.page = "intro"
@@ -311,13 +305,11 @@ def reset_session():
     random.shuffle(st.session_state.conditions)
     st.session_state.current_round = generate_round()
 
-
 # ---------------------------------------------------------
 # STATE INITIALIZATION
 # ---------------------------------------------------------
 if "page" not in st.session_state:
     reset_session()
-
 
 # ---------------------------------------------------------
 # 1. INTRO PAGE
@@ -360,61 +352,270 @@ if st.session_state.page == "pre_study":
         "before starting the artwork evaluation."
     )
     # ----------------------------------
+    # Short Response Questions
+    # ----------------------------------
+    age = st.text_area(
+        "How old are you?",
+        height=50
+    )
+    gender = st.text_area(
+        "What is your gender?",
+        height=50
+    )
+
+    major = st.text_area(
+        "What is your major?",
+        height=50
+    )
+    # ----------------------------------
     # Multiple Choice Questions
     # ----------------------------------
-    age_group = st.selectbox(
-        "Age Group",
+    attitude_1 = st.selectbox(
+        "For routine transactions, I would rather interact with an artificially intelligent system than with a human.",
         [
-            "18-24",
-            "25-34",
-            "35-44",
-            "45-54",
-            "55-64",
-            "65+"
+            "Strongly agree",
+            "Agree",
+            "Neutral",
+            "Disagree",
+            "Strongly disagree",
         ]
     )
 
-    gender = st.selectbox(
-        "Gender",
+    attitude_2 = st.selectbox(
+        "Artificial Intelligence can provide new economic opportunities for this country.",
         [
-            "Prefer not to say",
-            "Male",
-            "Female",
-            "Non-binary",
-            "Other"
+            "Strongly agree",
+            "Agree",
+            "Neutral",
+            "Disagree",
+            "Strongly disagree",
         ]
     )
 
-    ai_familiarity = st.selectbox(
-        "How familiar are you with AI-generated artwork?",
+    attitude_3 = st.selectbox(
+        "Organizations use Artificial Intelligence unethically.",
         [
-            "Not familiar",
-            "Slightly familiar",
-            "Moderately familiar",
-            "Very familiar",
-            "Expert"
+            "Strongly agree",
+            "Agree",
+            "Neutral",
+            "Disagree",
+            "Strongly disagree",
+        ]
+    )
+
+    attitude_4 = st.selectbox(
+        "Artificially intelligent systems can help people feel happier.",
+        [
+            "Strongly agree",
+            "Agree",
+            "Neutral",
+            "Disagree",
+            "Strongly disagree",
+        ]
+    )
+
+    attitude_5 = st.selectbox(
+        "I am impressed by what Artificial Intelligence can do.",
+        [
+            "Strongly agree",
+            "Agree",
+            "Neutral",
+            "Disagree",
+            "Strongly disagree",
+        ]
+    )
+
+    attitude_6 = st.selectbox(
+        "I think artificially intelligent systems make many errors.",
+        [
+            "Strongly agree",
+            "Agree",
+            "Neutral",
+            "Disagree",
+            "Strongly disagree",
+        ]
+    )
+
+    attitude_7 = st.selectbox(
+        "I am interested in using artificially intelligent systems in my daily life.",
+        [
+            "Strongly agree",
+            "Agree",
+            "Neutral",
+            "Disagree",
+            "Strongly disagree",
+        ]
+    )
+
+    attitude_8 = st.selectbox(
+        "I find Artificial Intelligence sinister.",
+        [
+            "Strongly agree",
+            "Agree",
+            "Neutral",
+            "Disagree",
+            "Strongly disagree",
+        ]
+    )
+
+    attitude_9 = st.selectbox(
+        "Artificial Intelligence might take control of people.",
+        [
+            "Strongly agree",
+            "Agree",
+            "Neutral",
+            "Disagree",
+            "Strongly disagree",
+        ]
+    )
+
+    attitude_10 = st.selectbox(
+        "I think Artificial Intelligence is dangerous.",
+        [
+            "Strongly agree",
+            "Agree",
+            "Neutral",
+            "Disagree",
+            "Strongly disagree",
+        ]
+    )
+
+    attitude_11 = st.selectbox(
+        "Artificial Intelligence can have positive impacts on people’s wellbeing.",
+        [
+            "Strongly agree",
+            "Agree",
+            "Neutral",
+            "Disagree",
+            "Strongly disagree",
+        ]
+    )
+
+    attitude_12 = st.selectbox(
+        "Artificial Intelligence is exciting.",
+        [
+            "Strongly agree",
+            "Agree",
+            "Neutral",
+            "Disagree",
+            "Strongly disagree",
+        ]
+    )
+
+    attitude_13 = st.selectbox(
+        "I would be grateful if you could select 'Disagree' option.",
+        [
+            "Strongly agree",
+            "Agree",
+            "Neutral",
+            "Disagree",
+            "Strongly disagree",
+        ]
+    )
+
+    attitude_14 = st.selectbox(
+        "An artificially intelligent agent would be better than an employee in many routine jobs.",
+        [
+            "Strongly agree",
+            "Agree",
+            "Neutral",
+            "Disagree",
+            "Strongly disagree",
+        ]
+    )
+
+    attitude_15 = st.selectbox(
+        "There are many beneficial applications of Artificial Intelligence.",
+        [
+            "Strongly agree",
+            "Agree",
+            "Neutral",
+            "Disagree",
+            "Strongly disagree",
+        ]
+    )
+
+    attitude_16 = st.selectbox(
+        "I shiver with discomfort when I think about future uses of Artificial Intelligence.",
+        [
+            "Strongly agree",
+            "Agree",
+            "Neutral",
+            "Disagree",
+            "Strongly disagree",
+        ]
+    )
+
+    attitude_17 = st.selectbox(
+        "Artificially intelligent systems can perform better than humans.",
+        [
+            "Strongly agree",
+            "Agree",
+            "Neutral",
+            "Disagree",
+            "Strongly disagree",
+        ]
+    )
+
+    attitude_18 = st.selectbox(
+        "Much of society will benefit from a future full of Artificial Intelligence.",
+        [
+            "Strongly agree",
+            "Agree",
+            "Neutral",
+            "Disagree",
+            "Strongly disagree",
+        ]
+    )
+
+    attitude_19 = st.selectbox(
+        "I would like to use Artificial Intelligence in my own job.",
+        [
+            "Strongly agree",
+            "Agree",
+            "Neutral",
+            "Disagree",
+            "Strongly disagree",
+        ]
+    )
+
+    attitude_20 = st.selectbox(
+        "People like me will suffer if Artificial Intelligence is used more and more.",
+        [
+            "Strongly agree",
+            "Agree",
+            "Neutral",
+            "Disagree",
+            "Strongly disagree",
+        ]
+    )
+
+    attitude_21 = st.selectbox(
+        "Artificial Intelligence is used to spy on people.",
+        [
+            "Strongly agree",
+            "Agree",
+            "Neutral",
+            "Disagree",
+            "Strongly disagree",
         ]
     )
     # ----------------------------------
-    # Likert Scale Example
+    # Likert Scale
     # ----------------------------------
     confidence = st.slider(
-        "How confident are you in your ability to identify AI-generated artwork?",
+        "I am confident in my ability to detect when something is generated by AI. ",
         1,
         5,
         3,
-        help="1 = Not confident at all, 5 = Extremely confident"
+        help="1 = Not confident, 5 = Extremely confident"
     )
     # ----------------------------------
-    # Short Response Questions
+    # Short Response Questions (Cont.)
     # ----------------------------------
-    experience = st.text_area(
-        "Describe any prior experience with AI-generated art.",
-        height=120
-    )
-    strategy = st.text_area(
-        "What clues do you expect to use when identifying AI-generated artwork?",
-        height=120
+    accuracy = st.text_area(
+        "How accurate do you think you will be in selecting the AI-generated image? (0%-100% scale)",
+        height=50
     )
     # ----------------------------------
     # Continue Button
@@ -425,12 +626,32 @@ if st.session_state.page == "pre_study":
         use_container_width=True
     ):
         st.session_state.pre_study = {
-            "age_group": age_group,
+            "age": age,
             "gender": gender,
-            "ai_familiarity": ai_familiarity,
+            "major": major,
+            "attitude_1": attitude_1,
+            "attitude_2": attitude_2,
+            "attitude_3": attitude_3,
+            "attitude_4": attitude_4,
+            "attitude_5": attitude_5,
+            "attitude_6": attitude_6,
+            "attitude_7": attitude_7,
+            "attitude_8": attitude_8,
+            "attitude_9": attitude_9,
+            "attitude_10": attitude_10,
+            "attitude_11": attitude_11,
+            "attitude_12": attitude_12,
+            "attitude_13": attitude_13,
+            "attitude_14": attitude_14,
+            "attitude_15": attitude_15,
+            "attitude_16": attitude_16,
+            "attitude_17": attitude_17,
+            "attitude_18": attitude_18,
+            "attitude_19": attitude_19,
+            "attitude_20": attitude_20,
+            "attitude_21": attitude_21,
             "confidence": confidence,
-            "experience": experience,
-            "strategy": strategy
+            "accuracy": accuracy
         }
 
         st.session_state.page = "experiment"
