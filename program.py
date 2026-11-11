@@ -378,6 +378,7 @@ if st.session_state.page == "pre_study":
             "Neutral",
             "Disagree",
             "Strongly disagree",
+            index=None,
         ]
     )
 
@@ -389,6 +390,7 @@ if st.session_state.page == "pre_study":
             "Neutral",
             "Disagree",
             "Strongly disagree",
+            index=None,
         ]
     )
 
@@ -400,6 +402,7 @@ if st.session_state.page == "pre_study":
             "Neutral",
             "Disagree",
             "Strongly disagree",
+            index=None,
         ]
     )
 
@@ -411,6 +414,7 @@ if st.session_state.page == "pre_study":
             "Neutral",
             "Disagree",
             "Strongly disagree",
+            index=None,
         ]
     )
 
@@ -422,6 +426,7 @@ if st.session_state.page == "pre_study":
             "Neutral",
             "Disagree",
             "Strongly disagree",
+            index=None,
         ]
     )
 
@@ -433,6 +438,7 @@ if st.session_state.page == "pre_study":
             "Neutral",
             "Disagree",
             "Strongly disagree",
+            index=None,
         ]
     )
 
@@ -444,6 +450,7 @@ if st.session_state.page == "pre_study":
             "Neutral",
             "Disagree",
             "Strongly disagree",
+            index=None,
         ]
     )
 
@@ -455,6 +462,7 @@ if st.session_state.page == "pre_study":
             "Neutral",
             "Disagree",
             "Strongly disagree",
+            index=None,
         ]
     )
 
@@ -466,6 +474,7 @@ if st.session_state.page == "pre_study":
             "Neutral",
             "Disagree",
             "Strongly disagree",
+            index=None,
         ]
     )
 
@@ -477,6 +486,7 @@ if st.session_state.page == "pre_study":
             "Neutral",
             "Disagree",
             "Strongly disagree",
+            index=None,
         ]
     )
 
@@ -488,6 +498,7 @@ if st.session_state.page == "pre_study":
             "Neutral",
             "Disagree",
             "Strongly disagree",
+            index=None,
         ]
     )
 
@@ -499,6 +510,7 @@ if st.session_state.page == "pre_study":
             "Neutral",
             "Disagree",
             "Strongly disagree",
+            index=None,
         ]
     )
 
@@ -510,6 +522,7 @@ if st.session_state.page == "pre_study":
             "Neutral",
             "Disagree",
             "Strongly disagree",
+            index=None,
         ]
     )
 
@@ -521,6 +534,7 @@ if st.session_state.page == "pre_study":
             "Neutral",
             "Disagree",
             "Strongly disagree",
+            index=None,
         ]
     )
 
@@ -532,6 +546,7 @@ if st.session_state.page == "pre_study":
             "Neutral",
             "Disagree",
             "Strongly disagree",
+            index=None,
         ]
     )
 
@@ -543,6 +558,7 @@ if st.session_state.page == "pre_study":
             "Neutral",
             "Disagree",
             "Strongly disagree",
+            index=None,
         ]
     )
 
@@ -554,6 +570,7 @@ if st.session_state.page == "pre_study":
             "Neutral",
             "Disagree",
             "Strongly disagree",
+            index=None,
         ]
     )
 
@@ -565,6 +582,7 @@ if st.session_state.page == "pre_study":
             "Neutral",
             "Disagree",
             "Strongly disagree",
+            index=None,
         ]
     )
 
@@ -576,6 +594,7 @@ if st.session_state.page == "pre_study":
             "Neutral",
             "Disagree",
             "Strongly disagree",
+            index=None,
         ]
     )
 
@@ -587,6 +606,7 @@ if st.session_state.page == "pre_study":
             "Neutral",
             "Disagree",
             "Strongly disagree",
+            index=None,
         ]
     )
 
@@ -598,6 +618,7 @@ if st.session_state.page == "pre_study":
             "Neutral",
             "Disagree",
             "Strongly disagree",
+            index=None,
         ]
     )
     # ----------------------------------
