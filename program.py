@@ -206,6 +206,25 @@ st.markdown(
     .stTextArea textarea::placeholder {
         color: #cccccc !important;
     }
+
+    /* Dataframe text */
+    [data-testid="stDataFrame"] {
+        color: white !important;
+    }
+    
+    [data-testid="stDataFrame"] * {
+        color: white !important;
+    }
+    
+    /* Dataframe cells */
+    [data-testid="stDataFrame"] td {
+        color: white !important;
+    }
+    
+    /* Dataframe headers */
+    [data-testid="stDataFrame"] th {
+        color: white !important;
+    }
     </style>
 """,
     unsafe_allow_html=True,
