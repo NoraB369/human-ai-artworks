@@ -221,6 +221,11 @@ st.markdown(
     .ag-header-cell-text {
         color: white !important;
     }
+
+    /* Expander body content only */
+    [data-testid="stExpanderDetails"] {
+        color: white !important;
+    }
     </style>
 """,
     unsafe_allow_html=True,
