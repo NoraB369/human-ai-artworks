@@ -846,12 +846,22 @@ if st.session_state.page == "experiment":
                 total_correct = int(
                     df_temp["guess_A_correct"].sum() + df_temp["guess_B_correct"].sum()
                 )
+
+                file_name = "participantData.csv"
+                mime_type = "text/csv"
+                hyperlink = f'<a href="data:{mime_type};base64,{b64}" download="{file_name}">Click here to download {file_name}</a>'
+                
+                @st.cache_data
+                def to_csv(data: df_temp.DataFrame) -> bytes:
+                  return data.to_csv(index=False).encode("utf-8")
+                
                 accuracy = float((total_correct / (NUM_ROUNDS * 2)) * 100)
                 payload = {
                     "pre_study": st.session_state.pre_study,
                     "accuracy": accuracy,
                     "total_correct": total_correct,
                     "results": st.session_state.results,
+                    "hyperlink": hyperlink,
                 }
 
                 requests.post(WEB_APP_URL, json=payload, timeout=5)
