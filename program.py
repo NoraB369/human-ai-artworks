@@ -296,7 +296,7 @@ def reset_session():
     st.session_state.page = "intro"
     st.session_state.round = 1
     st.session_state.results = []
-    st.session_state.pre_study = {}
+    st.session_state.pre_study = []
     st.session_state.human_pool = human_images.copy()
     st.session_state.ai_pool = ai_images.copy()
     random.shuffle(st.session_state.human_pool)
@@ -848,7 +848,7 @@ if st.session_state.page == "experiment":
                 )
                 accuracy = float((total_correct / (NUM_ROUNDS * 2)) * 100)
                 payload = {
-                    "pre_study": st.session_state.pre_study,
+                    #"pre_study": st.session_state.pre_study,
                     "accuracy": accuracy,
                     "total_correct": total_correct,
                     "results": st.session_state.results,
