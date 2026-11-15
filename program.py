@@ -11,7 +11,7 @@ WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzFhfKVVRCVhbeS2gou4wC2mb
 # ---------------------------------------------------------
 # CONFIGURATION & MATERIAL DESIGN 3 SETUP
 # ---------------------------------------------------------
-NUM_ROUNDS = 5
+NUM_ROUNDS = 1
 HUMAN_DIR = "dataset/human-made"
 AI_DIR = "dataset/ai-generated"
 SUPPORTED_EXTENSIONS = (".jpg", ".jpeg", ".png")
@@ -315,8 +315,8 @@ def generate_round():
 def reset_session():
     st.session_state.page = "intro"
     st.session_state.round = 1
-    st.session_state.results = []
     st.session_state.pre_study = []
+    st.session_state.results = []
     st.session_state.human_pool = human_images.copy()
     st.session_state.ai_pool = ai_images.copy()
     random.shuffle(st.session_state.human_pool)
