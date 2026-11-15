@@ -48,7 +48,7 @@ st.markdown(
     }
 
     /* Typography hierarchy */
-    p, span, label, div, h1, h2, h3, h4, h5, h6 {
+    p, span, label, h1, h2, h3, h4, h5, h6 {
         color: #1d1b20 !important;
         font-family: "Roboto", system-ui, -apple-system, sans-serif !important;
     }
@@ -219,11 +219,6 @@ st.markdown(
     
     /* AG Grid headers */
     .ag-header-cell-text {
-        color: white !important;
-    }
-    
-    /* Expander content */
-    [data-testid="stExpander"] * {
         color: white !important;
     }
     </style>
@@ -906,6 +901,6 @@ if st.session_state.page == "results":
 
     st.write("")
     with st.expander("Inspect Detailed Session Data", expanded=True):
-        st.dataframe(df, use_container_width=True, hide_index=False)
+        st.dataframe(df, use_container_width=True, hide_index=True)
 
     st.write("")
