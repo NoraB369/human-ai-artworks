@@ -874,7 +874,7 @@ if st.session_state.page == "results":
     st.write("")
 
     df = pd.DataFrame(st.session_state.results)
-    total_correct = int(df["guess_A_correct"].sum() + df["guess_B_correct"].sum()) - 2
+    total_correct = int(df["guess_A_correct"].sum() + df["guess_B_correct"].sum())
     total_predictions = len(df) * 2
     accuracy = (total_correct / total_predictions) * 100
 
