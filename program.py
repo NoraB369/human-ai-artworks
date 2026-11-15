@@ -880,7 +880,7 @@ if st.session_state.page == "results":
 
     m1, m2, m3 = st.columns(3)
     m1.metric("Accuracy", f"{accuracy:.1f}%")
-    m2.metric("Correct Guesses", f"{total_correct}/{NUM_ROUNDS * 2}")
+    m2.metric("Correct Guesses", f"{total_correct}/{total_predictions}")
     m3.metric("Rounds Evaluated", NUM_ROUNDS)
 
     st.write("")
