@@ -206,6 +206,26 @@ st.markdown(
     .stTextArea textarea::placeholder {
         color: #cccccc !important;
     }
+
+    /* Streamlit dataframe */
+    [data-testid="stDataFrame"] * {
+        color: white !important;
+    }
+    
+    /* AG Grid cells */
+    .ag-cell {
+        color: white !important;
+    }
+    
+    /* AG Grid headers */
+    .ag-header-cell-text {
+        color: white !important;
+    }
+    
+    /* Expander content */
+    [data-testid="stExpander"] * {
+        color: white !important;
+    }
     </style>
 """,
     unsafe_allow_html=True,
@@ -231,7 +251,7 @@ def load_dataset():
             )
     return images
 
-BASE_CONDITIONS = [
+CONDITIONS = [
     ("HXH", "correct"),
     ("HXH", "wrong"),
     ("HXH", "one_wrong"),
@@ -244,19 +264,12 @@ BASE_CONDITIONS = [
     ("AXH", "one_wrong"),
 ]
 
-CONDITIONS = []
-
-for _ in range(NUM_ROUNDS // len(BASE_CONDITIONS)):
-    CONDITIONS.extend(BASE_CONDITIONS)
-
-random.shuffle(CONDITIONS)
-
 ALL_IMAGES = load_dataset()
 human_images = [img for img in ALL_IMAGES if img["true_type"] == "Human-Made"]
 ai_images = [img for img in ALL_IMAGES if img["true_type"] == "AI-Generated"]
 
-if len(human_images) < NUM_ROUNDS or len(ai_images) < NUM_ROUNDS:
-    st.error("Insufficient images: minimum 50 human-made and 50 AI-generated images required.")
+if len(human_images) < 10 or len(ai_images) < 10:
+    st.error("Insufficient images: minimum 10 human-made and 10 AI-generated images required.")
     st.stop()
 
 def opposite_label(label):
@@ -302,8 +315,8 @@ def generate_round():
 def reset_session():
     st.session_state.page = "intro"
     st.session_state.round = 1
+    st.session_state.pre_study = []
     st.session_state.results = []
-    st.session_state.pre_study = {}
     st.session_state.human_pool = human_images.copy()
     st.session_state.ai_pool = ai_images.copy()
     random.shuffle(st.session_state.human_pool)
@@ -686,34 +699,36 @@ if st.session_state.page == "pre_study":
         use_container_width=True,
         disabled=not all_answered
     ):
-        st.session_state.pre_study = {
-            "age": age,
-            "gender": gender,
-            "major": major,
-            "attitude_1": attitude_1,
-            "attitude_2": attitude_2,
-            "attitude_3": attitude_3,
-            "attitude_4": attitude_4,
-            "attitude_5": attitude_5,
-            "attitude_6": attitude_6,
-            "attitude_7": attitude_7,
-            "attitude_8": attitude_8,
-            "attitude_9": attitude_9,
-            "attitude_10": attitude_10,
-            "attitude_11": attitude_11,
-            "attitude_12": attitude_12,
-            "attitude_13": attitude_13,
-            "attitude_14": attitude_14,
-            "attitude_15": attitude_15,
-            "attitude_16": attitude_16,
-            "attitude_17": attitude_17,
-            "attitude_18": attitude_18,
-            "attitude_19": attitude_19,
-            "attitude_20": attitude_20,
-            "attitude_21": attitude_21,
-            "confidence": confidence,
-            "accuracy": accuracy
-        }
+        st.session_state.results.append(
+            {
+                "age": age,
+                "gender": gender,
+                "major": major,
+                "attitude_1": attitude_1,
+                "attitude_2": attitude_2,
+                "attitude_3": attitude_3,
+                "attitude_4": attitude_4,
+                "attitude_5": attitude_5,
+                "attitude_6": attitude_6,
+                "attitude_7": attitude_7,
+                "attitude_8": attitude_8,
+                "attitude_9": attitude_9,
+                "attitude_10": attitude_10,
+                "attitude_11": attitude_11,
+                "attitude_12": attitude_12,
+                "attitude_13": attitude_13,
+                "attitude_14": attitude_14,
+                "attitude_15": attitude_15,
+                "attitude_16": attitude_16,
+                "attitude_17": attitude_17,
+                "attitude_18": attitude_18,
+                "attitude_19": attitude_19,
+                "attitude_20": attitude_20,
+                "attitude_21": attitude_21,
+                "confidence": confidence,
+                "accuracy": accuracy
+            }
+        )
 
         st.session_state.page = "experiment"
         st.rerun()
@@ -851,6 +866,7 @@ if st.session_state.page == "experiment":
                 total_correct = int(
                     df_temp["guess_A_correct"].sum() + df_temp["guess_B_correct"].sum()
                 )
+                
                 accuracy = float((total_correct / (NUM_ROUNDS * 2)) * 100)
                 payload = {
                     "pre_study": st.session_state.pre_study,
@@ -880,7 +896,7 @@ if st.session_state.page == "results":
 
     df = pd.DataFrame(st.session_state.results)
     total_correct = int(df["guess_A_correct"].sum() + df["guess_B_correct"].sum())
-    total_predictions = len(df) * 2
+    total_predictions = len(df) * 2 - 2
     accuracy = (total_correct / total_predictions) * 100
 
     m1, m2, m3 = st.columns(3)
@@ -889,21 +905,7 @@ if st.session_state.page == "results":
     m3.metric("Rounds Evaluated", NUM_ROUNDS)
 
     st.write("")
-    with st.expander("Inspect Detailed Session Data", expanded=False):
+    with st.expander("Inspect Detailed Session Data", expanded=True):
         st.dataframe(df, use_container_width=True, hide_index=True)
 
     st.write("")
-    c1, c2 = st.columns(2)
-    with c1:
-        csv = df.to_csv(index=False)
-        st.download_button(
-            "Download Data (CSV)",
-            csv,
-            "artwork_study_results.csv",
-            "text/csv",
-            use_container_width=True,
-        )
-    with c2:
-        if st.button("Start New Session", use_container_width=True):
-            reset_session()
-            st.rerun()
