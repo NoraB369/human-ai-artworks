@@ -886,17 +886,9 @@ if st.session_state.page == "results":
         st.dataframe(df, use_container_width=True, hide_index=True)
 
     st.write("")
-    c1, c2 = st.columns(2)
+    c1 = st.columns(1)
+    
     with c1:
-        csv = df.to_csv(index=False)
-        st.download_button(
-            "Download Data (CSV)",
-            csv,
-            "artwork_study_results.csv",
-            "text/csv",
-            use_container_width=True,
-        )
-    with c2:
         if st.button("Start New Session", use_container_width=True):
             reset_session()
             st.rerun()
