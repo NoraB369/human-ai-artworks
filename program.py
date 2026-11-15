@@ -679,7 +679,7 @@ if st.session_state.page == "pre_study":
         use_container_width=True,
         disabled=not all_answered
     ):
-        st.session_state.pre_study = {
+        st.session_state.pre_study.append = {
             "age": age,
             "gender": gender,
             "major": major,
@@ -707,11 +707,6 @@ if st.session_state.page == "pre_study":
             "confidence": confidence,
             "accuracy": accuracy
         }
-
-        payload = {
-            "pre_study": st.session_state.pre_study,
-        }
-        requests.post(WEB_APP_URL, json=payload, timeout=5)
 
         st.session_state.page = "experiment"
         st.rerun()
@@ -891,7 +886,6 @@ if st.session_state.page == "results":
         st.dataframe(df, use_container_width=True, hide_index=True)
 
     st.write("")
-    #c1 = st.columns(1)
     
     if st.button("Start New Session", use_container_width=True):
         reset_session()
