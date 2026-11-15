@@ -679,34 +679,36 @@ if st.session_state.page == "pre_study":
         use_container_width=True,
         disabled=not all_answered
     ):
-        st.session_state.pre_study.append = {
-            "age": age,
-            "gender": gender,
-            "major": major,
-            "attitude_1": attitude_1,
-            "attitude_2": attitude_2,
-            "attitude_3": attitude_3,
-            "attitude_4": attitude_4,
-            "attitude_5": attitude_5,
-            "attitude_6": attitude_6,
-            "attitude_7": attitude_7,
-            "attitude_8": attitude_8,
-            "attitude_9": attitude_9,
-            "attitude_10": attitude_10,
-            "attitude_11": attitude_11,
-            "attitude_12": attitude_12,
-            "attitude_13": attitude_13,
-            "attitude_14": attitude_14,
-            "attitude_15": attitude_15,
-            "attitude_16": attitude_16,
-            "attitude_17": attitude_17,
-            "attitude_18": attitude_18,
-            "attitude_19": attitude_19,
-            "attitude_20": attitude_20,
-            "attitude_21": attitude_21,
-            "confidence": confidence,
-            "accuracy": accuracy
-        }
+        st.session_state.results.append(
+            {
+                "age": age,
+                "gender": gender,
+                "major": major,
+                "attitude_1": attitude_1,
+                "attitude_2": attitude_2,
+                "attitude_3": attitude_3,
+                "attitude_4": attitude_4,
+                "attitude_5": attitude_5,
+                "attitude_6": attitude_6,
+                "attitude_7": attitude_7,
+                "attitude_8": attitude_8,
+                "attitude_9": attitude_9,
+                "attitude_10": attitude_10,
+                "attitude_11": attitude_11,
+                "attitude_12": attitude_12,
+                "attitude_13": attitude_13,
+                "attitude_14": attitude_14,
+                "attitude_15": attitude_15,
+                "attitude_16": attitude_16,
+                "attitude_17": attitude_17,
+                "attitude_18": attitude_18,
+                "attitude_19": attitude_19,
+                "attitude_20": attitude_20,
+                "attitude_21": attitude_21,
+                "confidence": confidence,
+                "accuracy": accuracy
+            }
+        )
 
         st.session_state.page = "experiment"
         st.rerun()
