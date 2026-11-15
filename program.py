@@ -708,6 +708,11 @@ if st.session_state.page == "pre_study":
             "accuracy": accuracy
         }
 
+        payload = {
+            "pre_study": st.session_state.pre_study,
+        }
+        requests.post(WEB_APP_URL, json=payload, timeout=5)
+
         st.session_state.page = "experiment"
         st.rerun()
     st.stop()
