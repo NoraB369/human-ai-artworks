@@ -48,7 +48,7 @@ st.markdown(
     }
 
     /* Typography hierarchy */
-    p, span, label, h1, h2, h3, h4, h5, h6 {
+    p, span, label, div, h1, h2, h3, h4, h5, h6 {
         color: #1d1b20 !important;
         font-family: "Roboto", system-ui, -apple-system, sans-serif !important;
     }
@@ -694,7 +694,7 @@ if st.session_state.page == "pre_study":
         use_container_width=True,
         disabled=not all_answered
     ):
-        st.session_state.results.append(
+        st.session_state.pre_study.append(
             {
                 "age": age,
                 "gender": gender,
