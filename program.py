@@ -888,7 +888,3 @@ if st.session_state.page == "results":
         st.dataframe(df, use_container_width=True, hide_index=True)
 
     st.write("")
-    
-    if st.button("Start New Session", use_container_width=True):
-        reset_session()
-        st.rerun()
