@@ -906,6 +906,6 @@ if st.session_state.page == "results":
 
     st.write("")
     with st.expander("Inspect Detailed Session Data", expanded=True):
-        st.dataframe(df, use_container_width=True, hide_index=True)
+        st.dataframe(df, use_container_width=True, hide_index=False)
 
     st.write("")
