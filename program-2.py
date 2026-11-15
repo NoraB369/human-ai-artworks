@@ -268,7 +268,7 @@ ALL_IMAGES = load_dataset()
 human_images = [img for img in ALL_IMAGES if img["true_type"] == "Human-Made"]
 ai_images = [img for img in ALL_IMAGES if img["true_type"] == "AI-Generated"]
 
-if len(human_images) < 10 or len(ai_images) < 10:
+if len(human_images) < NUM_ROUNDS or len(ai_images) < NUM_ROUNDS:
     st.error("Insufficient images: minimum 10 human-made and 10 AI-generated images required.")
     st.stop()
 
