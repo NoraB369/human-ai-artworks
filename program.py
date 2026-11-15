@@ -207,22 +207,23 @@ st.markdown(
         color: #cccccc !important;
     }
 
-    /* Dataframe text */
-    [data-testid="stDataFrame"] {
-        color: white !important;
-    }
-    
+    /* Streamlit dataframe */
     [data-testid="stDataFrame"] * {
         color: white !important;
     }
     
-    /* Dataframe cells */
-    [data-testid="stDataFrame"] td {
+    /* AG Grid cells */
+    .ag-cell {
         color: white !important;
     }
     
-    /* Dataframe headers */
-    [data-testid="stDataFrame"] th {
+    /* AG Grid headers */
+    .ag-header-cell-text {
+        color: white !important;
+    }
+    
+    /* Expander content */
+    [data-testid="stExpander"] * {
         color: white !important;
     }
     </style>
