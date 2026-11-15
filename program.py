@@ -885,7 +885,7 @@ if st.session_state.page == "results":
     m3.metric("Rounds Evaluated", NUM_ROUNDS)
 
     st.write("")
-    with st.expander("Inspect Detailed Session Data", expanded=False):
+    with st.expander("Inspect Detailed Session Data", expanded=True):
         st.dataframe(df, use_container_width=True, hide_index=True)
 
     st.write("")
