@@ -11,7 +11,7 @@ WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzFhfKVVRCVhbeS2gou4wC2mb
 # ---------------------------------------------------------
 # CONFIGURATION & MATERIAL DESIGN 3 SETUP
 # ---------------------------------------------------------
-NUM_ROUNDS = 1
+NUM_ROUNDS = 5
 HUMAN_DIR = "dataset/human-made"
 AI_DIR = "dataset/ai-generated"
 SUPPORTED_EXTENSIONS = (".jpg", ".jpeg", ".png")
@@ -221,9 +221,9 @@ st.markdown(
     .ag-header-cell-text {
         color: white !important;
     }
-
-    /* Expander body content only */
-    [data-testid="stExpanderDetails"] {
+    
+    /* Expander content */
+    [data-testid="stExpander"] * {
         color: white !important;
     }
     </style>
@@ -699,7 +699,7 @@ if st.session_state.page == "pre_study":
         use_container_width=True,
         disabled=not all_answered
     ):
-        st.session_state.pre_study.append(
+        st.session_state.results.append(
             {
                 "age": age,
                 "gender": gender,
