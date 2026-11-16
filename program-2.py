@@ -361,7 +361,7 @@ if st.session_state.page == "intro":
 # ---------------------------------------------------------
 # 2. PRE-STUDY QUESTIONNAIRE
 # ---------------------------------------------------------
-if st.session_state.page == "pre_study">
+if st.session_state.page == "pre_study":
     LIKERT_OPTIONS = [
         "Strongly agree",
         "Agree",
