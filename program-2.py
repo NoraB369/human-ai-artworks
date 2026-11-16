@@ -19,11 +19,11 @@ SUPPORTED_EXTENSIONS = (".jpg", ".jpeg", ".png")
 st.set_page_config(
     page_title="Artwork Perception Study",
     page_icon="🎨",
-    layout="centered",
+    layout="wide",
     initial_sidebar_state="collapsed",
 )
 
-# Material Design 3 Token Stylesheet with High Contrast Fixes
+# Material Design 3 Token Stylesheet with Clean Layout Spacing
 st.markdown(
     """
     <style>
@@ -42,9 +42,9 @@ st.markdown(
 
     /* Container layout */
     .block-container {
-        padding-top: 3.5rem !important;
-        padding-bottom: 4rem !important;
-        max-width: 960px !important;
+        padding-top: 1.5rem !important;
+        padding-bottom: 2rem !important;
+        max-width: 1100px !important;
     }
 
     /* Typography hierarchy */
@@ -53,56 +53,105 @@ st.markdown(
         font-family: "Roboto", system-ui, -apple-system, sans-serif !important;
     }
 
-    /* Remove default boxed borders */
-    [data-testid="stVerticalBlockBorderWrapper"] {
-        border: none !important;
-        box-shadow: none !important;
-        background: transparent !important;
-        padding: 0 !important;
+    div[data-testid="stVerticalBlock"] {
+        gap: 0.5rem !important;
     }
 
-    /* Large artwork display with M3 Elevation */
+    /* Container Box Styling for questionnaire items */
+    [data-testid="stVerticalBlockBorderWrapper"] {
+        border: 1px solid #d5cedb !important;
+        border-radius: 10px !important;
+        background: #ffffff !important;
+        padding: 10px 14px !important;
+        margin-bottom: 6px !important;
+        box-shadow: none !important;
+    }
+
+    /* Custom styling for horizontal 5-button radio options */
+    [data-testid="stRadio"] [role="radiogroup"] {
+        display: flex !important;
+        flex-direction: row !important;
+        flex-wrap: nowrap !important;
+        gap: 6px !important;
+        width: 100% !important;
+    }
+
+    [data-testid="stRadio"] [role="radiogroup"] label {
+        background: #f5f1f8 !important;
+        border: 1px solid #ded6e7 !important;
+        border-radius: 8px !important;
+        padding: 6px 4px !important;
+        flex: 1 !important;
+        display: flex !important;
+        justify-content: center !important;
+        align-items: center !important;
+        cursor: pointer;
+        transition: 0.1s ease;
+    }
+
+    [data-testid="stRadio"] [role="radiogroup"] label:hover {
+        background: #eaddff !important;
+        border-color: #6750a4 !important;
+    }
+
+    [data-testid="stRadio"] [role="radiogroup"] label:has(input:checked) {
+        background: #eaddff !important;
+        border: 1.5px solid #6750a4 !important;
+    }
+
+    [data-testid="stRadio"] [role="radiogroup"] label p {
+        font-size: 0.78rem !important;
+        font-weight: 650 !important;
+        color: #381e72 !important;
+        margin: 0 !important;
+        text-align: center !important;
+    }
+
+    [data-testid="stRadio"] input {
+        display: none !important;
+    }
+
+    /* Artwork display with controlled height to prevent overlap */
     [data-testid="stImage"] {
         display: flex;
         justify-content: center;
         align-items: center;
-        margin-top: 0.75rem;
-        margin-bottom: 1rem;
+        margin-top: 0.2rem;
+        margin-bottom: 0.6rem;
     }
     [data-testid="stImage"] img {
-        max-height: min(48vh, 420px) !important;
+        max-height: min(26vh, 220px) !important;
         width: 100% !important;
         object-fit: contain;
-        border-radius: 16px;
-        box-shadow: 0 4px 16px rgba(29, 27, 32, 0.08);
+        border-radius: 12px;
+        box-shadow: 0 3px 12px rgba(29, 27, 32, 0.08);
     }
 
     /* M3 Typography & Metadata Tokens */
     .round-indicator {
-        font-size: 0.85rem;
-        font-weight: 500;
+        font-size: 0.8rem;
+        font-weight: 600;
         letter-spacing: 0.05em;
         color: #49454f !important;
         text-transform: uppercase;
-        margin-bottom: 0.25rem;
+        margin-bottom: 0.2rem;
     }
     .card-title {
-        font-size: 1.25rem;
-        font-weight: 500;
-        letter-spacing: 0em;
+        font-size: 1.1rem;
+        font-weight: 600;
         color: #1d1b20 !important;
-        margin-bottom: 0.25rem;
+        margin-bottom: 0.2rem;
     }
     .meta-tag {
         display: inline-block;
-        font-size: 0.75rem;
-        font-weight: 500;
-        letter-spacing: 0.02em;
-        padding: 4px 12px;
-        border-radius: 8px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        letter-spacing: 0.03em;
+        padding: 3px 10px;
+        border-radius: 6px;
         background: #e8def8;
         color: #1d192b !important;
-        margin-bottom: 0.5rem;
+        margin-bottom: 0.4rem;
     }
 
     /* Material 3 Progress Bar */
@@ -115,15 +164,14 @@ st.markdown(
         border-radius: 4px;
     }
 
-    /* Primary Button (Next Round / Submit) - Solid Filled Purple */
+    /* Primary Button */
     div.stButton > button[kind="primary"] {
         background-color: #6750a4 !important;
         color: #ffffff !important;
-        border-radius: 20px !important;
-        height: 48px !important;
+        border-radius: 16px !important;
+        height: 42px !important;
         font-weight: 500 !important;
-        font-size: 0.95rem !important;
-        letter-spacing: 0.01em !important;
+        font-size: 0.9rem !important;
         border: none !important;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15) !important;
         transition: all 0.2s ease !important;
@@ -131,24 +179,21 @@ st.markdown(
     }
     div.stButton > button[kind="primary"]:hover {
         background-color: #7965af !important;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2) !important;
     }
     div.stButton > button[kind="primary"] p, 
     div.stButton > button[kind="primary"] span {
         color: #ffffff !important;
-        font-size: 0.95rem !important;
-        font-weight: 500 !important;
     }
 
-    /* Secondary Choice Buttons (Unselected/Selected Choice Chips) - Clear contrast */
+    /* Secondary Choice Buttons */
     div.stButton > button[kind="secondary"] {
         background-color: #f3edf7 !important;
         color: #1d1b20 !important;
         border: 1px solid #cac4d0 !important;
-        border-radius: 20px !important;
-        height: 46px !important;
+        border-radius: 16px !important;
+        height: 40px !important;
         font-weight: 500 !important;
-        font-size: 0.95rem !important;
+        font-size: 0.9rem !important;
         transition: all 0.2s ease !important;
         width: 100% !important;
         box-shadow: none !important;
@@ -160,71 +205,20 @@ st.markdown(
     div.stButton > button[kind="secondary"] p, 
     div.stButton > button[kind="secondary"] span {
         color: #1d1b20 !important;
-        font-size: 0.95rem !important;
-        font-weight: 500 !important;
     }
 
-    /* Disabled state for Primary button */
     div.stButton > button[kind="primary"]:disabled {
         background-color: #1d1b201f !important;
         color: #1d1b2061 !important;
-        box-shadow: none !important;
-    }
-    div.stButton > button[kind="primary"]:disabled p, 
-    div.stButton > button[kind="primary"]:disabled span {
-        color: #1d1b2061 !important;
-    }
-
-    /* Material Design 3 dropdown styling */
-    .stSelectbox div[data-baseweb="select"] > div {
-        background-color: #ffffff !important;
-        color: #1d1b20 !important;
-        border: 1px solid #cac4d0 !important;
-    }
-    
-    div[role="listbox"] {
-        background-color: #ffffff !important;
-    }
-    
-    div[role="option"] {
-        color: #1d1b20 !important;
-        background-color: #ffffff !important;
-    }
-    
-    div[role="option"]:hover {
-        background-color: #f3edf7 !important;
     }
 
     /* Short-answer text box */
     .stTextArea textarea {
-        color: #ffffff !important;
-        background-color: #2b2b2b !important;
-        caret-color: #ffffff !important;
-    }
-    
-    /* Placeholder text */
-    .stTextArea textarea::placeholder {
-        color: #cccccc !important;
-    }
-
-    /* Streamlit dataframe */
-    [data-testid="stDataFrame"] * {
-        color: white !important;
-    }
-    
-    /* AG Grid cells */
-    .ag-cell {
-        color: white !important;
-    }
-    
-    /* AG Grid headers */
-    .ag-header-cell-text {
-        color: white !important;
-    }
-    
-    /* Expander content */
-    [data-testid="stExpander"] * {
-        color: white !important;
+        color: #1d1b20 !important;
+        background-color: #ffffff !important;
+        border: 1px solid #cac4d0 !important;
+        border-radius: 8px !important;
+        caret-color: #6750a4 !important;
     }
     </style>
 """,
@@ -368,6 +362,14 @@ if st.session_state.page == "intro":
 # 2. PRE-STUDY QUESTIONNAIRE
 # ---------------------------------------------------------
 if st.session_state.page == "pre_study":
+    LIKERT_OPTIONS = [
+        "Strongly agree",
+        "Agree",
+        "Neutral",
+        "Disagree",
+        "Strongly disagree",
+    ]
+
     st.markdown(
         '<span class="meta-tag">Pre-Study Questionnaire</span>',
         unsafe_allow_html=True
@@ -394,260 +396,55 @@ if st.session_state.page == "pre_study":
         "What is your major?",
         height=50
     )
-    # ----------------------------------
-    # Multiple Choice Questions
-    # ----------------------------------
-    attitude_1 = st.selectbox(
+    
+    ATTITUDE_STATEMENTS = [
         "For routine transactions, I would rather interact with an artificially intelligent system than with a human.",
-        [
-            "Strongly agree",
-            "Agree",
-            "Neutral",
-            "Disagree",
-            "Strongly disagree",
-        ],
-        index=None,
-    )
-
-    attitude_2 = st.selectbox(
         "Artificial Intelligence can provide new economic opportunities for this country.",
-        [
-            "Strongly agree",
-            "Agree",
-            "Neutral",
-            "Disagree",
-            "Strongly disagree",
-        ],
-        index=None,
-    )
-
-    attitude_3 = st.selectbox(
         "Organizations use Artificial Intelligence unethically.",
-        [
-            "Strongly agree",
-            "Agree",
-            "Neutral",
-            "Disagree",
-            "Strongly disagree",
-        ],
-        index=None,
-    )
-
-    attitude_4 = st.selectbox(
         "Artificially intelligent systems can help people feel happier.",
-        [
-            "Strongly agree",
-            "Agree",
-            "Neutral",
-            "Disagree",
-            "Strongly disagree",
-        ],
-        index=None,
-    )
-
-    attitude_5 = st.selectbox(
         "I am impressed by what Artificial Intelligence can do.",
-        [
-            "Strongly agree",
-            "Agree",
-            "Neutral",
-            "Disagree",
-            "Strongly disagree",
-        ],
-        index=None,
-    )
-
-    attitude_6 = st.selectbox(
         "I think artificially intelligent systems make many errors.",
-        [
-            "Strongly agree",
-            "Agree",
-            "Neutral",
-            "Disagree",
-            "Strongly disagree",
-        ],
-        index=None,
-    )
-
-    attitude_7 = st.selectbox(
         "I am interested in using artificially intelligent systems in my daily life.",
-        [
-            "Strongly agree",
-            "Agree",
-            "Neutral",
-            "Disagree",
-            "Strongly disagree",
-        ],
-        index=None,
-    )
-
-    attitude_8 = st.selectbox(
         "I find Artificial Intelligence sinister.",
-        [
-            "Strongly agree",
-            "Agree",
-            "Neutral",
-            "Disagree",
-            "Strongly disagree",
-        ],
-        index=None,
-    )
-
-    attitude_9 = st.selectbox(
         "Artificial Intelligence might take control of people.",
-        [
-            "Strongly agree",
-            "Agree",
-            "Neutral",
-            "Disagree",
-            "Strongly disagree",
-        ],
-        index=None,
-    )
-
-    attitude_10 = st.selectbox(
         "I think Artificial Intelligence is dangerous.",
-        [
-            "Strongly agree",
-            "Agree",
-            "Neutral",
-            "Disagree",
-            "Strongly disagree",
-        ],
-        index=None,
-    )
-
-    attitude_11 = st.selectbox(
         "Artificial Intelligence can have positive impacts on people’s wellbeing.",
-        [
-            "Strongly agree",
-            "Agree",
-            "Neutral",
-            "Disagree",
-            "Strongly disagree",
-        ],
-        index=None,
-    )
-
-    attitude_12 = st.selectbox(
         "Artificial Intelligence is exciting.",
-        [
-            "Strongly agree",
-            "Agree",
-            "Neutral",
-            "Disagree",
-            "Strongly disagree",
-        ],
-        index=None,
-    )
-
-    attitude_13 = st.selectbox(
         "I would be grateful if you could select 'Disagree' option.",
-        [
-            "Strongly agree",
-            "Agree",
-            "Neutral",
-            "Disagree",
-            "Strongly disagree",
-        ],
-        index=None,
-    )
-
-    attitude_14 = st.selectbox(
         "An artificially intelligent agent would be better than an employee in many routine jobs.",
-        [
-            "Strongly agree",
-            "Agree",
-            "Neutral",
-            "Disagree",
-            "Strongly disagree",
-        ],
-        index=None,
-    )
-
-    attitude_15 = st.selectbox(
         "There are many beneficial applications of Artificial Intelligence.",
-        [
-            "Strongly agree",
-            "Agree",
-            "Neutral",
-            "Disagree",
-            "Strongly disagree",
-        ],
-        index=None,
-    )
-
-    attitude_16 = st.selectbox(
         "I shiver with discomfort when I think about future uses of Artificial Intelligence.",
-        [
-            "Strongly agree",
-            "Agree",
-            "Neutral",
-            "Disagree",
-            "Strongly disagree",
-        ],
-        index=None,
-    )
-
-    attitude_17 = st.selectbox(
         "Artificially intelligent systems can perform better than humans.",
-        [
-            "Strongly agree",
-            "Agree",
-            "Neutral",
-            "Disagree",
-            "Strongly disagree",
-        ],
-        index=None,
-    )
-
-    attitude_18 = st.selectbox(
         "Much of society will benefit from a future full of Artificial Intelligence.",
-        [
-            "Strongly agree",
-            "Agree",
-            "Neutral",
-            "Disagree",
-            "Strongly disagree",
-        ],
-        index=None,
-    )
-
-    attitude_19 = st.selectbox(
         "I would like to use Artificial Intelligence in my own job.",
-        [
-            "Strongly agree",
-            "Agree",
-            "Neutral",
-            "Disagree",
-            "Strongly disagree",
-        ],
-        index=None,
-    )
-
-    attitude_20 = st.selectbox(
         "People like me will suffer if Artificial Intelligence is used more and more.",
-        [
-            "Strongly agree",
-            "Agree",
-            "Neutral",
-            "Disagree",
-            "Strongly disagree",
-        ],
-        index=None,
-    )
-
-    attitude_21 = st.selectbox(
         "Artificial Intelligence is used to spy on people.",
-        [
-            "Strongly agree",
-            "Agree",
-            "Neutral",
-            "Disagree",
-            "Strongly disagree",
-        ],
-        index=None,
-    )
+    ]
+
+    attitudes = {}
+    for i, statement in enumerate(ATTITUDE_STATEMENTS):
+        q_num = i + 1
+        with st.container(border=True):
+            st.markdown(
+                f"""
+                <div style="font-size:10px; color:#6750a4; font-weight:700; margin-bottom:2px;">
+                    QUESTION {q_num:02d}
+                </div>
+                <div style="font-size:13px; font-weight:500; color:#1d1b20; margin-bottom:6px;">
+                    {statement}
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+            attitudes[f"attitude_{q_num}"] = st.radio(
+                f"Attitude {q_num}",
+                options=LIKERT_OPTIONS,
+                index=None,
+                horizontal=True,
+                label_visibility="collapsed",
+                key=f"attitude_radio_{q_num}"
+            )
+
     # ----------------------------------
     # Likert Scale
     # ----------------------------------
@@ -673,28 +470,7 @@ if st.session_state.page == "pre_study":
         age.strip() != ""
         and gender.strip() != ""
         and major.strip() != ""
-        and attitude_1 is not None
-        and attitude_2 is not None
-        and attitude_3 is not None
-        and attitude_4 is not None
-        and attitude_5 is not None
-        and attitude_6 is not None
-        and attitude_7 is not None
-        and attitude_8 is not None
-        and attitude_9 is not None
-        and attitude_10 is not None
-        and attitude_11 is not None
-        and attitude_12 is not None
-        and attitude_13 is not None
-        and attitude_14 is not None
-        and attitude_15 is not None
-        and attitude_16 is not None
-        and attitude_17 is not None
-        and attitude_18 is not None
-        and attitude_19 is not None
-        and attitude_20 is not None
-        and attitude_21 is not None
-        and age.strip() != ""
+        and all(attitudes[f"attitude_{i}"] is not None for i in range(1, 22))
         and accuracy.strip() != ""
     )
     # ----------------------------------
@@ -706,37 +482,15 @@ if st.session_state.page == "pre_study":
         use_container_width=True,
         disabled=not all_answered
     ):
-        st.session_state.results.append(
-            {
-                "age": age,
-                "gender": gender,
-                "major": major,
-                "attitude_1": attitude_1,
-                "attitude_2": attitude_2,
-                "attitude_3": attitude_3,
-                "attitude_4": attitude_4,
-                "attitude_5": attitude_5,
-                "attitude_6": attitude_6,
-                "attitude_7": attitude_7,
-                "attitude_8": attitude_8,
-                "attitude_9": attitude_9,
-                "attitude_10": attitude_10,
-                "attitude_11": attitude_11,
-                "attitude_12": attitude_12,
-                "attitude_13": attitude_13,
-                "attitude_14": attitude_14,
-                "attitude_15": attitude_15,
-                "attitude_16": attitude_16,
-                "attitude_17": attitude_17,
-                "attitude_18": attitude_18,
-                "attitude_19": attitude_19,
-                "attitude_20": attitude_20,
-                "attitude_21": attitude_21,
-                "confidence": confidence,
-                "accuracy": accuracy
-            }
-        )
-
+        result_entry = {
+            "age": age,
+            "gender": gender,
+            "major": major,
+            **{k: v for k, v in attitudes.items()},
+            "confidence": confidence,
+            "accuracy": accuracy
+        }
+        st.session_state.pre_study = [result_entry]
         st.session_state.page = "experiment"
         st.rerun()
     st.stop()
@@ -756,14 +510,13 @@ if st.session_state.page == "experiment":
         unsafe_allow_html=True,
     )
     st.progress(st.session_state.round / NUM_ROUNDS)
-    st.write("")
 
     # State keys for current round
     guess_a_key = f"guess_a_{st.session_state.round}"
     guess_b_key = f"guess_b_{st.session_state.round}"
     pref_key = f"pref_{st.session_state.round}"
 
-    # Side-by-side artwork evaluation
+    # Side-by-side artwork evaluation with generous gap
     col_a, col_b = st.columns(2, gap="large")
 
     with col_a:
@@ -774,10 +527,10 @@ if st.session_state.page == "experiment":
         )
         st.image(round_data["image_a"]["path"], use_container_width=True)
         
-        st.markdown('<p style="font-size: 0.875rem; font-weight: 500; color: #49454f; margin-bottom: 0.4rem;">Artwork A is:</p>', unsafe_allow_html=True)
+        st.markdown('<div style="margin-top: 0.75rem; margin-bottom: 0.4rem; font-size: 0.85rem; font-weight: 500; color: #49454f;">Artwork A is:</div>', unsafe_allow_html=True)
         current_guess_a = st.session_state.get(guess_a_key)
         
-        ga_col1, ga_col2 = st.columns(2)
+        ga_col1, ga_col2 = st.columns(2, gap="small")
         with ga_col1:
             if st.button("Human-Made", key=f"btn_ga_h_{st.session_state.round}", use_container_width=True, type="primary" if current_guess_a == "Human-Made" else "secondary"):
                 st.session_state[guess_a_key] = "Human-Made"
@@ -795,10 +548,10 @@ if st.session_state.page == "experiment":
         )
         st.image(round_data["image_b"]["path"], use_container_width=True)
         
-        st.markdown('<p style="font-size: 0.875rem; font-weight: 500; color: #49454f; margin-bottom: 0.4rem;">Artwork B is:</p>', unsafe_allow_html=True)
+        st.markdown('<div style="margin-top: 0.75rem; margin-bottom: 0.4rem; font-size: 0.85rem; font-weight: 500; color: #49454f;">Artwork B is:</div>', unsafe_allow_html=True)
         current_guess_b = st.session_state.get(guess_b_key)
         
-        gb_col1, gb_col2 = st.columns(2)
+        gb_col1, gb_col2 = st.columns(2, gap="small")
         with gb_col1:
             if st.button("Human-Made", key=f"btn_gb_h_{st.session_state.round}", use_container_width=True, type="primary" if current_guess_b == "Human-Made" else "secondary"):
                 st.session_state[guess_b_key] = "Human-Made"
@@ -808,17 +561,16 @@ if st.session_state.page == "experiment":
                 st.session_state[guess_b_key] = "AI-Generated"
                 st.rerun()
 
-    st.write("")
-    st.write("---")
+    st.markdown('<hr style="margin: 1rem 0 0.75rem 0; border: none; border-top: 1px solid #e7e0ec;">', unsafe_allow_html=True)
 
     # Preference selection & submission bar
-    pref_col, btn_col = st.columns([1.3, 1], gap="medium", vertical_alignment="center")
+    pref_col, btn_col = st.columns([1.3, 1], gap="large", vertical_alignment="center")
 
     with pref_col:
-        st.markdown('<p style="font-size: 0.875rem; font-weight: 500; color: #49454f; margin-bottom: 0.4rem;">Preferred Artwork:</p>', unsafe_allow_html=True)
+        st.markdown('<div style="margin-bottom: 0.4rem; font-size: 0.85rem; font-weight: 500; color: #49454f;">Preferred Artwork:</div>', unsafe_allow_html=True)
         current_pref = st.session_state.get(pref_key)
         
-        p_col1, p_col2 = st.columns(2)
+        p_col1, p_col2 = st.columns(2, gap="small")
         with p_col1:
             if st.button("Artwork A", key=f"btn_pref_a_{st.session_state.round}", use_container_width=True, type="primary" if current_pref == "Artwork A" else "secondary"):
                 st.session_state[pref_key] = "Artwork A"
@@ -835,7 +587,6 @@ if st.session_state.page == "experiment":
     all_answered = (current_guess_a is not None) and (current_guess_b is not None) and (current_pref is not None)
 
     with btn_col:
-        st.write("")
         submit_btn = st.button(
             "Next Round →" if st.session_state.round < NUM_ROUNDS else "Submit & Finish →",
             type="primary",
@@ -859,6 +610,7 @@ if st.session_state.page == "experiment":
                 "true_type_B": image_b["true_type"],
                 "displayed_label_A": round_data["display_label_a"],
                 "displayed_label_B": round_data["display_label_b"],
+    
                 "user_guess_A": current_guess_a,
                 "user_guess_B": current_guess_b,
                 "guess_A_correct": current_guess_a == image_a["true_type"],
