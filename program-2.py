@@ -347,8 +347,7 @@ if st.session_state.page == "intro":
 
     st.markdown(
         """
-- **Examine**: Compare the two artworks and review their catalog labels.
-- **Evaluate**: Classify whether each is truly Human-Made or AI-Generated.
+- **Examine**: Compare the two artworks and review their catalog labels. Note: Some catalog Labels are intentionally misleading and may not accurately reflect the content presented. 
 - **Decide**: Select the artwork you personally prefer.
         """
     )
