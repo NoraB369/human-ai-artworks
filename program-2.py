@@ -1,8 +1,6 @@
-import base64
 import json
 import os
 import random
-from io import BytesIO
 import pandas as pd
 from PIL import Image, ImageDraw
 import requests
@@ -130,10 +128,7 @@ div[data-testid="stVerticalBlock"] {
     box-shadow: none !important;
 }
 
-/* -------------------------------------------------------
-   CONSISTENT NUMBERED 1–5 RESPONSE CHIPS
-------------------------------------------------------- */
-
+/* Compact numbered response chips */
 [data-testid="stRadio"] [role="radiogroup"] {
     display: flex !important;
     flex-direction: row !important;
@@ -248,49 +243,36 @@ div.stButton > button[kind="primary"]:disabled {
 }
 
 /* -------------------------------------------------------
-   ARTWORK DISPLAY WITH BOTTOM-RIGHT LABEL
+   ARTWORK DISPLAY
 ------------------------------------------------------- */
 
-.artwork-frame {
-    position: relative;
-    width: 100%;
-    height: min(36vh, 320px);
+[data-testid="stImage"] {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-top: 0.2rem;
-    margin-bottom: 0.35rem;
-    overflow: hidden;
-    border-radius: 12px;
+    margin-top: 0.2rem !important;
+    margin-bottom: 0.25rem !important;
 }
 
-.artwork-frame img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
+[data-testid="stImage"] img {
+    height: min(36vh, 320px) !important;
+    max-height: 36vh !important;
+    width: 100% !important;
+    object-fit: contain !important;
     border-radius: 12px;
     box-shadow: 0 3px 12px rgba(29, 27, 32, 0.08);
 }
 
-/* AI / Human tag */
-.artwork-tag {
-    position: absolute;
-    right: 12px;
-    bottom: 12px;
-    z-index: 2;
-
+/* Catalog label */
+.catalog-label {
     display: inline-block;
-    padding: 5px 11px;
-
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 4px 10px;
     background: #eaddff;
     color: #381e72 !important;
-
-    font-size: 0.72rem;
-    font-weight: 700;
-    letter-spacing: 0.04em;
-
     border-radius: 7px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+    margin-bottom: 0.2rem;
 }
 
 /* Artwork classification question */
@@ -323,8 +305,9 @@ div.stButton > button[kind="primary"]:disabled {
         padding-bottom: 0.4rem !important;
     }
 
-    .artwork-frame {
+    [data-testid="stImage"] img {
         height: 28vh !important;
+        max-height: 28vh !important;
     }
 
     [data-testid="stRadio"] [role="radiogroup"] {
@@ -343,8 +326,9 @@ div.stButton > button[kind="primary"]:disabled {
 /* Short laptop screens */
 @media (min-width: 769px) and (max-height: 800px) {
 
-    .artwork-frame {
+    [data-testid="stImage"] img {
         height: 29vh !important;
+        max-height: 29vh !important;
     }
 
     .block-container {
@@ -384,35 +368,6 @@ def load_dataset():
             })
 
     return images
-
-
-def render_artwork(path, displayed_label):
-    """Render artwork with an AI/Human tag in its bottom-right corner."""
-
-    short_label = (
-        "AI" if displayed_label == "AI-Generated" else "Human"
-    )
-
-    with Image.open(path) as source:
-        artwork = source.copy()
-        artwork.thumbnail((1600, 1200))
-
-        buffer = BytesIO()
-        artwork.save(buffer, format="PNG")
-
-    encoded_image = base64.b64encode(
-        buffer.getvalue()
-    ).decode("utf-8")
-
-    return f"""
-        <div class="artwork-frame">
-            <img
-                src="data:image/png;base64,{encoded_image}"
-                alt="Artwork"
-            />
-            <span class="artwork-tag">{short_label}</span>
-        </div>
-    """
 
 
 # Preserve original experimental conditions
@@ -574,7 +529,6 @@ if "page" not in st.session_state:
 
 # =========================================================
 # 1. INTRO PAGE
-# ORIGINAL SCREEN — UNCHANGED
 # =========================================================
 
 if st.session_state.page == "intro":
@@ -1023,11 +977,15 @@ if st.session_state.page == "experiment":
         )
 
         st.markdown(
-            render_artwork(
-                round_data["image_a"]["path"],
-                round_data["display_label_a"]
-            ),
+            f'<span class="catalog-label">'
+            f'Catalog: {round_data["display_label_a"]}'
+            f'</span>',
             unsafe_allow_html=True
+        )
+
+        st.image(
+            round_data["image_a"]["path"],
+            use_container_width=True
         )
 
         st.markdown(
@@ -1081,11 +1039,15 @@ if st.session_state.page == "experiment":
         )
 
         st.markdown(
-            render_artwork(
-                round_data["image_b"]["path"],
-                round_data["display_label_b"]
-            ),
+            f'<span class="catalog-label">'
+            f'Catalog: {round_data["display_label_b"]}'
+            f'</span>',
             unsafe_allow_html=True
+        )
+
+        st.image(
+            round_data["image_b"]["path"],
+            use_container_width=True
         )
 
         st.markdown(
