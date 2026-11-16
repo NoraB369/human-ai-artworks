@@ -23,7 +23,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed",
 )
 
-# Material Design 3 Token Stylesheet with Compact Viewport & Custom Radio Chips
+# Material Design 3 Token Stylesheet with Clean Layout Spacing
 st.markdown(
     """
     <style>
@@ -40,10 +40,10 @@ st.markdown(
         color: #1d1b20 !important;
     }
 
-    /* Ultra-compact container layout to prevent scrolling on artwork view */
+    /* Container layout */
     .block-container {
-        padding-top: 1rem !important;
-        padding-bottom: 1rem !important;
+        padding-top: 1.5rem !important;
+        padding-bottom: 2rem !important;
         max-width: 1100px !important;
     }
 
@@ -54,7 +54,7 @@ st.markdown(
     }
 
     div[data-testid="stVerticalBlock"] {
-        gap: 0.35rem !important;
+        gap: 0.5rem !important;
     }
 
     /* Container Box Styling for questionnaire items */
@@ -62,8 +62,8 @@ st.markdown(
         border: 1px solid #d5cedb !important;
         border-radius: 10px !important;
         background: #ffffff !important;
-        padding: 8px 12px !important;
-        margin-bottom: 4px !important;
+        padding: 10px 14px !important;
+        margin-bottom: 6px !important;
         box-shadow: none !important;
     }
 
@@ -111,16 +111,16 @@ st.markdown(
         display: none !important;
     }
 
-    /* Compact artwork display to ensure zero scrolling */
+    /* Artwork display with controlled height to prevent overlap */
     [data-testid="stImage"] {
         display: flex;
         justify-content: center;
         align-items: center;
         margin-top: 0.2rem;
-        margin-bottom: 0.4rem;
+        margin-bottom: 0.6rem;
     }
     [data-testid="stImage"] img {
-        max-height: min(32vh, 280px) !important;
+        max-height: min(26vh, 220px) !important;
         width: 100% !important;
         object-fit: contain;
         border-radius: 12px;
@@ -134,13 +134,13 @@ st.markdown(
         letter-spacing: 0.05em;
         color: #49454f !important;
         text-transform: uppercase;
-        margin-bottom: 0.15rem;
+        margin-bottom: 0.2rem;
     }
     .card-title {
         font-size: 1.1rem;
         font-weight: 600;
         color: #1d1b20 !important;
-        margin-bottom: 0.15rem;
+        margin-bottom: 0.2rem;
     }
     .meta-tag {
         display: inline-block;
@@ -151,7 +151,7 @@ st.markdown(
         border-radius: 6px;
         background: #e8def8;
         color: #1d192b !important;
-        margin-bottom: 0.3rem;
+        margin-bottom: 0.4rem;
     }
 
     /* Material 3 Progress Bar */
@@ -516,7 +516,7 @@ if st.session_state.page == "experiment":
     guess_b_key = f"guess_b_{st.session_state.round}"
     pref_key = f"pref_{st.session_state.round}"
 
-    # Side-by-side artwork evaluation
+    # Side-by-side artwork evaluation with generous gap
     col_a, col_b = st.columns(2, gap="large")
 
     with col_a:
@@ -527,7 +527,7 @@ if st.session_state.page == "experiment":
         )
         st.image(round_data["image_a"]["path"], use_container_width=True)
         
-        st.markdown('<p style="font-size: 0.8rem; font-weight: 500; color: #49454f; margin-top: 0.4rem; margin-bottom: 0.3rem;">Artwork A is:</p>', unsafe_allow_html=True)
+        st.markdown('<div style="margin-top: 0.75rem; margin-bottom: 0.4rem; font-size: 0.85rem; font-weight: 500; color: #49454f;">Artwork A is:</div>', unsafe_allow_html=True)
         current_guess_a = st.session_state.get(guess_a_key)
         
         ga_col1, ga_col2 = st.columns(2, gap="small")
@@ -548,7 +548,7 @@ if st.session_state.page == "experiment":
         )
         st.image(round_data["image_b"]["path"], use_container_width=True)
         
-        st.markdown('<p style="font-size: 0.8rem; font-weight: 500; color: #49454f; margin-top: 0.4rem; margin-bottom: 0.3rem;">Artwork B is:</p>', unsafe_allow_html=True)
+        st.markdown('<div style="margin-top: 0.75rem; margin-bottom: 0.4rem; font-size: 0.85rem; font-weight: 500; color: #49454f;">Artwork B is:</div>', unsafe_allow_html=True)
         current_guess_b = st.session_state.get(guess_b_key)
         
         gb_col1, gb_col2 = st.columns(2, gap="small")
@@ -561,13 +561,13 @@ if st.session_state.page == "experiment":
                 st.session_state[guess_b_key] = "AI-Generated"
                 st.rerun()
 
-    st.markdown('<hr style="margin: 0.6rem 0; border: none; border-top: 1px solid #e7e0ec;">', unsafe_allow_html=True)
+    st.markdown('<hr style="margin: 1rem 0 0.75rem 0; border: none; border-top: 1px solid #e7e0ec;">', unsafe_allow_html=True)
 
     # Preference selection & submission bar
-    pref_col, btn_col = st.columns([1.3, 1], gap="medium", vertical_alignment="center")
+    pref_col, btn_col = st.columns([1.3, 1], gap="large", vertical_alignment="center")
 
     with pref_col:
-        st.markdown('<p style="font-size: 0.8rem; font-weight: 500; color: #49454f; margin-bottom: 0.3rem;">Preferred Artwork:</p>', unsafe_allow_html=True)
+        st.markdown('<div style="margin-bottom: 0.4rem; font-size: 0.85rem; font-weight: 500; color: #49454f;">Preferred Artwork:</div>', unsafe_allow_html=True)
         current_pref = st.session_state.get(pref_key)
         
         p_col1, p_col2 = st.columns(2, gap="small")
@@ -610,6 +610,7 @@ if st.session_state.page == "experiment":
                 "true_type_B": image_b["true_type"],
                 "displayed_label_A": round_data["display_label_a"],
                 "displayed_label_B": round_data["display_label_b"],
+    
                 "user_guess_A": current_guess_a,
                 "user_guess_B": current_guess_b,
                 "guess_A_correct": current_guess_a == image_a["true_type"],
