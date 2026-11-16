@@ -649,18 +649,15 @@ if st.session_state.page == "experiment":
                 )
 
                 accuracy = float((total_correct / (NUM_ROUNDS * 2)) * 100)
-                pre_study_record = (
-                    st.session_state.pre_study[0]
-                    if isinstance(st.session_state.pre_study, list)
-                    and st.session_state.pre_study
-                    else st.session_state.pre_study
-                )
+
+                # Prepend pre_study answers into results so your existing Apps Script saves both
+                combined_results = st.session_state.pre_study + st.session_state.results
 
                 payload = {
-                    "pre_study": pre_study_record,
+                    "pre_study": st.session_state.pre_study,
                     "accuracy": accuracy,
                     "total_correct": total_correct,
-                    "results": st.session_state.results,
+                    "results": combined_results,
                 }
 
                 resp = requests.post(WEB_APP_URL, json=payload, timeout=15)
