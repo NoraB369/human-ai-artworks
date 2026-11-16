@@ -120,7 +120,7 @@ st.markdown(
         margin-bottom: 0.35rem;
     }
     [data-testid="stImage"] img {
-        max-height: clamp(220px, calc(100vh - 340px), 65vh) !important;
+        max-height: clamp(220px, calc(100vh - 365px), 65vh) !important;
         max-width: 100% !important;
         width: auto !important;
         height: auto !important;
@@ -529,7 +529,7 @@ if st.session_state.page == "experiment":
         )
         st.image(round_data["image_a"]["path"], use_container_width=True)
         
-        st.markdown('<div style="margin-top: 0.35rem; margin-bottom: 0.25rem; font-size: 0.85rem; font-weight: 500; color: #49454f;">Artwork A is:</div>', unsafe_allow_html=True)
+        st.markdown('<div style="margin-top: 0.45rem; margin-bottom: 0.65rem; font-size: 0.85rem; font-weight: 500; color: #49454f;">Artwork A is:</div>', unsafe_allow_html=True)
         current_guess_a = st.session_state.get(guess_a_key)
         
         ga_col1, ga_col2 = st.columns(2, gap="small")
@@ -550,7 +550,7 @@ if st.session_state.page == "experiment":
         )
         st.image(round_data["image_b"]["path"], use_container_width=True)
         
-        st.markdown('<div style="margin-top: 0.35rem; margin-bottom: 0.25rem; font-size: 0.85rem; font-weight: 500; color: #49454f;">Artwork B is:</div>', unsafe_allow_html=True)
+        st.markdown('<div style="margin-top: 0.45rem; margin-bottom: 0.65rem; font-size: 0.85rem; font-weight: 500; color: #49454f;">Artwork B is:</div>', unsafe_allow_html=True)
         current_guess_b = st.session_state.get(guess_b_key)
         
         gb_col1, gb_col2 = st.columns(2, gap="small")
@@ -569,7 +569,7 @@ if st.session_state.page == "experiment":
     pref_col, btn_col = st.columns([1.3, 1], gap="large", vertical_alignment="center")
 
     with pref_col:
-        st.markdown('<div style="margin-bottom: 0.25rem; font-size: 0.85rem; font-weight: 500; color: #49454f;">Preferred Artwork:</div>', unsafe_allow_html=True)
+        st.markdown('<div style="margin-bottom: 0.65rem; font-size: 0.85rem; font-weight: 500; color: #49454f;">Preferred Artwork:</div>', unsafe_allow_html=True)
         current_pref = st.session_state.get(pref_key)
         
         p_col1, p_col2 = st.columns(2, gap="small")
