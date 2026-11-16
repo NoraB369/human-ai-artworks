@@ -120,7 +120,7 @@ st.markdown(
         margin-bottom: 0.4rem;
     }
     [data-testid="stImage"] img {
-        max-height: min(34vh, 300px) !important;
+        max-height: min(32vh, 280px) !important;
         width: 100% !important;
         object-fit: contain;
         border-radius: 12px;
@@ -517,7 +517,7 @@ if st.session_state.page == "experiment":
     pref_key = f"pref_{st.session_state.round}"
 
     # Side-by-side artwork evaluation
-    col_a, col_b = st.columns(2, gap="medium")
+    col_a, col_b = st.columns(2, gap="large")
 
     with col_a:
         st.markdown('<div class="card-title">Artwork A</div>', unsafe_allow_html=True)
@@ -527,7 +527,7 @@ if st.session_state.page == "experiment":
         )
         st.image(round_data["image_a"]["path"], use_container_width=True)
         
-        st.markdown('<p style="font-size: 0.8rem; font-weight: 500; color: #49454f; margin-bottom: 0.2rem;">Artwork A is:</p>', unsafe_allow_html=True)
+        st.markdown('<p style="font-size: 0.8rem; font-weight: 500; color: #49454f; margin-top: 0.4rem; margin-bottom: 0.3rem;">Artwork A is:</p>', unsafe_allow_html=True)
         current_guess_a = st.session_state.get(guess_a_key)
         
         ga_col1, ga_col2 = st.columns(2, gap="small")
@@ -548,7 +548,7 @@ if st.session_state.page == "experiment":
         )
         st.image(round_data["image_b"]["path"], use_container_width=True)
         
-        st.markdown('<p style="font-size: 0.8rem; font-weight: 500; color: #49454f; margin-bottom: 0.2rem;">Artwork B is:</p>', unsafe_allow_html=True)
+        st.markdown('<p style="font-size: 0.8rem; font-weight: 500; color: #49454f; margin-top: 0.4rem; margin-bottom: 0.3rem;">Artwork B is:</p>', unsafe_allow_html=True)
         current_guess_b = st.session_state.get(guess_b_key)
         
         gb_col1, gb_col2 = st.columns(2, gap="small")
@@ -561,13 +561,13 @@ if st.session_state.page == "experiment":
                 st.session_state[guess_b_key] = "AI-Generated"
                 st.rerun()
 
-    st.markdown('<hr style="margin: 0.4rem 0; border: none; border-top: 1px solid #e7e0ec;">', unsafe_allow_html=True)
+    st.markdown('<hr style="margin: 0.6rem 0; border: none; border-top: 1px solid #e7e0ec;">', unsafe_allow_html=True)
 
     # Preference selection & submission bar
     pref_col, btn_col = st.columns([1.3, 1], gap="medium", vertical_alignment="center")
 
     with pref_col:
-        st.markdown('<p style="font-size: 0.8rem; font-weight: 500; color: #49454f; margin-bottom: 0.2rem;">Preferred Artwork:</p>', unsafe_allow_html=True)
+        st.markdown('<p style="font-size: 0.8rem; font-weight: 500; color: #49454f; margin-bottom: 0.3rem;">Preferred Artwork:</p>', unsafe_allow_html=True)
         current_pref = st.session_state.get(pref_key)
         
         p_col1, p_col2 = st.columns(2, gap="small")
