@@ -1,7 +1,10 @@
+import base64
+from io import BytesIO
+import json
 import os
 import random
 import pandas as pd
-from PIL import Image
+from PIL import Image, ImageDraw
 import requests
 import streamlit as st
 
@@ -22,27 +25,31 @@ st.set_page_config(
     initial_sidebar_state="collapsed",
 )
 
-# Optimized Material Design 3 Stylesheet (Snappy Interactions & Full-Row Purple Chips)
+# Material Design 3 Token Stylesheet with High Contrast Fixes
 st.markdown(
     """
     <style>
+    /* Reset Streamlit default header */
     header[data-testid="stHeader"] {
         height: 2rem !important;
         background: transparent !important;
     }
     
+    /* M3 Surface Background */
     .stApp {
         background-color: #fef7ff !important;
         font-family: "Roboto", system-ui, -apple-system, sans-serif !important;
         color: #1d1b20 !important;
     }
 
+    /* Container layout */
     .block-container {
         padding-top: 1.5rem !important;
         padding-bottom: 2rem !important;
         max-width: 1080px !important;
     }
 
+    /* Typography hierarchy */
     p, span, label, div, h1, h2, h3, h4, h5, h6 {
         color: #1d1b20 !important;
         font-family: "Roboto", system-ui, -apple-system, sans-serif !important;
@@ -75,25 +82,24 @@ st.markdown(
         box-shadow: 0 0 0 2px #6750a422 !important;
     }
 
-    /* Full-Row Purple-Texted Response Chips for Pre-Study Questionnaire */
+    /* Consistent Numbered 1–5 Response Chips */
     [data-testid="stRadio"] [role="radiogroup"] {
         display: flex !important;
         flex-direction: row !important;
         flex-wrap: nowrap !important;
         gap: 8px !important;
-        width: 100% !important;
+        justify-content: space-between !important;
     }
 
     [data-testid="stRadio"] [role="radiogroup"] label {
         background: #f5f1f8 !important;
         border: 1px solid #ded6e7 !important;
         border-radius: 8px !important;
-        padding: 8px 6px !important;
+        padding: 6px 8px !important;
+        min-width: 0 !important;
         flex: 1 !important;
-        display: flex !important;
         justify-content: center !important;
-        align-items: center !important;
-        transition: 0.1s ease;
+        transition: 0.15s ease;
     }
 
     [data-testid="stRadio"] [role="radiogroup"] label:hover {
@@ -107,9 +113,9 @@ st.markdown(
     }
 
     [data-testid="stRadio"] [role="radiogroup"] label p {
-        font-size: 0.85rem !important;
+        font-size: 0.9rem !important;
         font-weight: 700 !important;
-        color: #6750a4 !important;
+        color: #381e72 !important;
         margin: 0 !important;
         text-align: center !important;
     }
@@ -122,7 +128,7 @@ st.markdown(
     .artwork-frame {
         position: relative;
         width: 100%;
-        height: min(38vh, 340px);
+        height: min(40vh, 360px);
         display: flex;
         justify-content: center;
         align-items: center;
@@ -131,6 +137,14 @@ st.markdown(
         overflow: hidden;
         border-radius: 14px;
         background: #f7f2fa;
+    }
+
+    .artwork-frame img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        border-radius: 14px;
+        box-shadow: 0 4px 16px rgba(29, 27, 32, 0.08);
     }
 
     .artwork-tag {
@@ -149,6 +163,7 @@ st.markdown(
         box-shadow: 0 2px 6px rgba(0, 0, 0, 0.14);
     }
 
+    /* M3 Typography & Metadata Tokens */
     .round-indicator {
         font-size: 0.85rem;
         font-weight: 600;
@@ -160,6 +175,7 @@ st.markdown(
     .card-title {
         font-size: 1.2rem;
         font-weight: 600;
+        letter-spacing: 0em;
         color: #1d1b20 !important;
         margin-bottom: 0.2rem;
     }
@@ -186,6 +202,7 @@ st.markdown(
         margin-bottom: 0.6rem;
     }
 
+    /* Material 3 Progress Bar */
     .stProgress > div > div > div > div {
         background-color: #6750a4 !important;
         border-radius: 4px;
@@ -195,7 +212,7 @@ st.markdown(
         border-radius: 4px;
     }
 
-    /* Primary Button */
+    /* Primary Button (Next Round / Submit) - Solid Filled Purple */
     div.stButton > button[kind="primary"] {
         background-color: #6750a4 !important;
         color: #ffffff !important;
@@ -203,13 +220,15 @@ st.markdown(
         height: 46px !important;
         font-weight: 500 !important;
         font-size: 0.95rem !important;
+        letter-spacing: 0.01em !important;
         border: none !important;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15) !important;
-        transition: background-color 0.1s ease !important;
+        transition: all 0.2s ease !important;
         width: 100% !important;
     }
     div.stButton > button[kind="primary"]:hover {
         background-color: #7965af !important;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2) !important;
     }
     div.stButton > button[kind="primary"] p, 
     div.stButton > button[kind="primary"] span {
@@ -218,7 +237,7 @@ st.markdown(
         font-weight: 500 !important;
     }
 
-    /* Secondary Choice Buttons */
+    /* Secondary Choice Buttons (Unselected Choice Chips) */
     div.stButton > button[kind="secondary"] {
         background-color: #f3edf7 !important;
         color: #1d1b20 !important;
@@ -227,7 +246,7 @@ st.markdown(
         height: 44px !important;
         font-weight: 500 !important;
         font-size: 0.92rem !important;
-        transition: background-color 0.1s ease !important;
+        transition: all 0.2s ease !important;
         width: 100% !important;
         box-shadow: none !important;
     }
@@ -242,9 +261,26 @@ st.markdown(
         font-weight: 500 !important;
     }
 
+    /* Disabled state for Primary button */
     div.stButton > button[kind="primary"]:disabled {
         background-color: #1d1b201f !important;
         color: #1d1b2061 !important;
+        box-shadow: none !important;
+    }
+    div.stButton > button[kind="primary"]:disabled p, 
+    div.stButton > button[kind="primary"]:disabled span {
+        color: #1d1b2061 !important;
+    }
+
+    /* Responsive adjustments for smaller laptop viewports */
+    @media (min-width: 769px) and (max-height: 820px) {
+        .artwork-frame {
+            height: 31vh !important;
+        }
+        .block-container {
+            padding-top: 0.75rem !important;
+            padding-bottom: 0.75rem !important;
+        }
     }
     </style>
 """,
@@ -259,21 +295,62 @@ def load_dataset():
     images = []
     for filename in os.listdir(HUMAN_DIR):
         if filename.lower().endswith(SUPPORTED_EXTENSIONS):
-            images.append({"path": os.path.join(HUMAN_DIR, filename), "true_type": "Human-Made"})
+            images.append(
+                {
+                    "path": os.path.join(HUMAN_DIR, filename),
+                    "true_type": "Human-Made",
+                }
+            )
     for filename in os.listdir(AI_DIR):
         if filename.lower().endswith(SUPPORTED_EXTENSIONS):
-            images.append({"path": os.path.join(AI_DIR, filename), "true_type": "AI-Generated"})
+            images.append(
+                {
+                    "path": os.path.join(AI_DIR, filename),
+                    "true_type": "AI-Generated",
+                }
+            )
     return images
 
+
+def render_artwork(path, displayed_label):
+    """Render artwork with an AI/Human tag in its bottom-right corner."""
+    short_label = "AI" if displayed_label == "AI-Generated" else "Human"
+
+    with Image.open(path) as source:
+        artwork = source.copy()
+        artwork.thumbnail((1600, 1200))
+
+        buffer = BytesIO()
+        artwork.save(buffer, format="PNG")
+
+    encoded_image = base64.b64encode(buffer.getvalue()).decode("utf-8")
+
+    return f"""
+        <div class="artwork-frame">
+            <img src="data:image/png;base64,{encoded_image}" alt="Artwork" />
+            <span class="artwork-tag">{short_label}</span>
+        </div>
+    """
+
+
 BASE_CONDITIONS = [
-    ("HXH", "correct"), ("HXH", "wrong"), ("HXH", "one_wrong"),
-    ("AXA", "correct"), ("AXA", "wrong"), ("AXA", "one_wrong"),
-    ("AXH", "correct"), ("AXH", "wrong"), ("AXH", "one_wrong"), ("AXH", "one_wrong"),
+    ("HXH", "correct"),
+    ("HXH", "wrong"),
+    ("HXH", "one_wrong"),
+    ("AXA", "correct"),
+    ("AXA", "wrong"),
+    ("AXA", "one_wrong"),
+    ("AXH", "correct"),
+    ("AXH", "wrong"),
+    ("AXH", "one_wrong"),
+    ("AXH", "one_wrong"),
 ]
 
 CONDITIONS = []
+
 while len(CONDITIONS) < NUM_ROUNDS:
     CONDITIONS.extend(BASE_CONDITIONS)
+
 CONDITIONS = CONDITIONS[:NUM_ROUNDS]
 
 ALL_IMAGES = load_dataset()
@@ -281,11 +358,15 @@ human_images = [img for img in ALL_IMAGES if img["true_type"] == "Human-Made"]
 ai_images = [img for img in ALL_IMAGES if img["true_type"] == "AI-Generated"]
 
 if len(human_images) < NUM_ROUNDS or len(ai_images) < NUM_ROUNDS:
-    st.error(f"Insufficient images: minimum {NUM_ROUNDS} human-made and {NUM_ROUNDS} AI-generated images required.")
+    st.error(
+        f"Insufficient images: minimum {NUM_ROUNDS} human-made and {NUM_ROUNDS} AI-generated images required."
+    )
     st.stop()
+
 
 def opposite_label(label):
     return "AI-Generated" if label == "Human-Made" else "Human-Made"
+
 
 def assign_labels(truth_a, truth_b, label_condition):
     if label_condition == "correct":
@@ -297,8 +378,10 @@ def assign_labels(truth_a, truth_b, label_condition):
             return opposite_label(truth_a), truth_b
         return truth_a, opposite_label(truth_b)
 
+
 def generate_round():
     pair_type, label_condition = st.session_state.conditions.pop()
+
     if pair_type == "HXH":
         image_a = st.session_state.human_pool.pop()
         image_b = st.session_state.human_pool.pop()
@@ -311,7 +394,9 @@ def generate_round():
         if random.choice([True, False]):
             image_a, image_b = image_b, image_a
 
-    label_a, label_b = assign_labels(image_a["true_type"], image_b["true_type"], label_condition)
+    label_a, label_b = assign_labels(
+        image_a["true_type"], image_b["true_type"], label_condition
+    )
     return {
         "condition": pair_type,
         "label_condition": label_condition,
@@ -320,6 +405,7 @@ def generate_round():
         "display_label_a": label_a,
         "display_label_b": label_b,
     }
+
 
 def reset_session():
     st.session_state.page = "intro"
@@ -334,29 +420,43 @@ def reset_session():
     random.shuffle(st.session_state.conditions)
     st.session_state.current_round = generate_round()
 
+
+# ---------------------------------------------------------
+# STATE INITIALIZATION
+# ---------------------------------------------------------
 if "page" not in st.session_state:
     reset_session()
 
+
 # ---------------------------------------------------------
-# 1. INTRO PAGE
+# 1. INTRO PAGE (ORIGINAL SCREEN — UNCHANGED)
 # ---------------------------------------------------------
 if st.session_state.page == "intro":
     st.markdown('<span class="meta-tag">Research Study</span>', unsafe_allow_html=True)
     st.subheader("Human vs. AI Artwork Perception")
-    st.write(f"This study investigates visual art perception, preference, and attribution across **{NUM_ROUNDS} image pairs**.")
-    st.markdown("""
+    st.write(
+        "This study investigates visual art perception, preference, and attribution across "
+        f"**{NUM_ROUNDS} image pairs**."
+    )
+
+    st.markdown(
+        """
 - **Examine**: Compare the two artworks and review their catalog labels.
 - **Evaluate**: Classify whether each is truly Human-Made or AI-Generated.
 - **Decide**: Select the artwork you personally prefer.
-    """)
+        """
+    )
+
     st.write("")
     if st.button("Begin Pre-Study Questions →", type="primary", use_container_width=True):
         st.session_state.page = "pre_study"
         st.rerun()
+
     st.stop()
 
+
 # ---------------------------------------------------------
-# 2. PRE-STUDY QUESTIONNAIRE
+# 2. PRE-STUDY QUESTIONNAIRE (REDESIGNED UI)
 # ---------------------------------------------------------
 if st.session_state.page == "pre_study":
     LIKERT_OPTIONS = {
@@ -391,11 +491,24 @@ if st.session_state.page == "pre_study":
         "Artificial Intelligence is used to spy on people.",
     ]
 
-    st.markdown('<span class="meta-tag">Pre-Study Questionnaire</span>', unsafe_allow_html=True)
+    st.markdown(
+        '<span class="meta-tag">Pre-Study Questionnaire</span>',
+        unsafe_allow_html=True,
+    )
     st.subheader("Before We Begin")
-    st.write("Please answer the following questions before starting the artwork evaluation.")
+    st.write(
+        "Please answer the following questions before starting the artwork evaluation."
+    )
 
-    st.markdown('<div class="section-heading">01 &nbsp; About You</div><div class="section-description">A few basic background questions.</div>', unsafe_allow_html=True)
+    # ----------------------------------
+    # Section 1: Demographics
+    # ----------------------------------
+    st.markdown(
+        '<div class="section-heading">01 &nbsp; About You</div>'
+        '<div class="section-description">A few basic background questions.</div>',
+        unsafe_allow_html=True,
+    )
+
     c1, c2, c3 = st.columns(3, gap="medium")
     with c1:
         age = st.text_input("How old are you?", placeholder="e.g. 24", key="age_input")
@@ -406,7 +519,17 @@ if st.session_state.page == "pre_study":
 
     st.divider()
 
-    st.markdown('<div class="section-heading">02 &nbsp; Your Views on AI</div><div class="section-description">How much do you agree or disagree with each statement? Select one option per question.</div>', unsafe_allow_html=True)
+    # ----------------------------------
+    # Section 2: AI Attitude Statements
+    # ----------------------------------
+    st.markdown(
+        '<div class="section-heading">02 &nbsp; Your Views on AI</div>'
+        '<div class="section-description">'
+        "How much do you agree or disagree with each statement? Select one number per question "
+        "(1 = Strongly agree · 2 = Agree · 3 = Neutral · 4 = Disagree · 5 = Strongly disagree)."
+        "</div>",
+        unsafe_allow_html=True,
+    )
 
     left_col, right_col = st.columns(2, gap="medium")
 
@@ -416,12 +539,23 @@ if st.session_state.page == "pre_study":
 
         with target_col:
             with st.container(border=True):
+                # Number and question inside the box above the options
                 st.markdown(
                     f"""
-                    <div style="font-size:11px; color:#6750a4; font-weight:700; letter-spacing:0.05em; margin-bottom:4px;">
+                    <div style="
+                        font-size:11px;
+                        color:#6750a4;
+                        font-weight:700;
+                        letter-spacing:0.05em;
+                        margin-bottom:4px;">
                         QUESTION {question_number:02d}
                     </div>
-                    <div style="font-size:13.5px; font-weight:500; line-height:1.45; color:#1d1b20; margin-bottom:10px;">
+                    <div style="
+                        font-size:13.5px;
+                        font-weight:500;
+                        line-height:1.45;
+                        color:#1d1b20;
+                        margin-bottom:10px;">
                         {question}
                     </div>
                     """,
@@ -431,21 +565,51 @@ if st.session_state.page == "pre_study":
                 st.radio(
                     f"Response to question {question_number}",
                     options=list(LIKERT_OPTIONS.keys()),
-                    format_func=lambda x: LIKERT_OPTIONS[x],
+                    format_func=lambda x: str(x),
                     horizontal=True,
                     index=None,
                     label_visibility="collapsed",
                     key=f"attitude_choice_{question_number}",
                 )
 
+                # Scale anchor labels directly below options inside the box
+                st.markdown(
+                    """
+                    <div style="
+                        display:flex;
+                        justify-content:space-between;
+                        font-size:10px;
+                        color:#49454f;
+                        margin-top:4px;
+                        padding:0 2px;">
+                        <span>Strongly agree</span>
+                        <span>Agree</span>
+                        <span>Neutral</span>
+                        <span>Disagree</span>
+                        <span>Strongly disagree</span>
+                    </div>
+                    """,
+                    unsafe_allow_html=True,
+                )
+
     st.divider()
 
-    st.markdown('<div class="section-heading">03 &nbsp; AI Detection Confidence</div><div class="section-description">Before viewing the artworks, tell us what you expect.</div>', unsafe_allow_html=True)
+    # ----------------------------------
+    # Section 3: Confidence & Accuracy
+    # ----------------------------------
+    st.markdown(
+        '<div class="section-heading">03 &nbsp; AI Detection Confidence</div>'
+        '<div class="section-description">Before viewing the artworks, tell us what you expect.</div>',
+        unsafe_allow_html=True,
+    )
 
     with st.container(border=True):
         confidence = st.slider(
             "I am confident in my ability to detect when something is generated by AI.",
-            min_value=1, max_value=5, value=3, key="confidence_input",
+            min_value=1,
+            max_value=5,
+            value=3,
+            key="confidence_input",
         )
         st.caption("1 = Not confident at all  ·  5 = Extremely confident")
 
@@ -455,6 +619,9 @@ if st.session_state.page == "pre_study":
             key="accuracy_input",
         )
 
+    # ----------------------------------
+    # Validation & Continue
+    # ----------------------------------
     accuracy_clean = accuracy.strip().replace("%", "")
     valid_accuracy = accuracy_clean.isdigit() and 0 <= int(accuracy_clean) <= 100
 
@@ -462,7 +629,10 @@ if st.session_state.page == "pre_study":
         age.strip() != ""
         and gender.strip() != ""
         and major.strip() != ""
-        and all(st.session_state.get(f"attitude_choice_{i}") is not None for i in range(1, 22))
+        and all(
+            st.session_state.get(f"attitude_choice_{i}") is not None
+            for i in range(1, 22)
+        )
         and valid_accuracy
     )
 
@@ -471,24 +641,36 @@ if st.session_state.page == "pre_study":
     elif not all_answered:
         st.caption("Complete all questions above to unlock the next step.")
 
-    if st.button("Continue to Study →", type="primary", use_container_width=True, disabled=not all_answered):
+    if st.button(
+        "Continue to Study →",
+        type="primary",
+        use_container_width=True,
+        disabled=not all_answered,
+    ):
         st.session_state.pre_study = [
             {
                 "age": age,
                 "gender": gender,
                 "major": major,
-                **{f"attitude_{i}": LIKERT_OPTIONS[st.session_state[f"attitude_choice_{i}"]] for i in range(1, 22)},
+                **{
+                    f"attitude_{i}": LIKERT_OPTIONS[
+                        st.session_state[f"attitude_choice_{i}"]
+                    ]
+                    for i in range(1, 22)
+                },
                 "confidence": confidence,
                 "accuracy": accuracy,
             }
         ]
+
         st.session_state.page = "experiment"
         st.rerun()
 
     st.stop()
 
+
 # ---------------------------------------------------------
-# 3. EXPERIMENT PAGE (SNAPPY STATE-BASED RENDERING)
+# 3. EXPERIMENT PAGE (RESPONSIVE SINGLE-VIEWPORT)
 # ---------------------------------------------------------
 if st.session_state.page == "experiment":
     if st.session_state.round > NUM_ROUNDS:
@@ -498,72 +680,133 @@ if st.session_state.page == "experiment":
     round_data = st.session_state.current_round
     current_round = st.session_state.round
 
-    st.markdown(f'<div class="round-indicator">Round {current_round} of {NUM_ROUNDS}</div>', unsafe_allow_html=True)
+    st.markdown(
+        f'<div class="round-indicator">Round {current_round} of {NUM_ROUNDS}</div>',
+        unsafe_allow_html=True,
+    )
     st.progress(current_round / NUM_ROUNDS)
 
+    # State keys for current round
     guess_a_key = f"guess_a_{current_round}"
     guess_b_key = f"guess_b_{current_round}"
     pref_key = f"pref_{current_round}"
 
+    # Side-by-side artwork evaluation
     col_a, col_b = st.columns(2, gap="large")
 
     with col_a:
         st.markdown('<div class="card-title">Artwork A</div>', unsafe_allow_html=True)
-        st.markdown(f'<span class="meta-tag">Catalog: {round_data["display_label_a"]}</span>', unsafe_allow_html=True)
-        
-        # Native Streamlit image rendering for maximum rendering speed
-        st.image(round_data["image_a"]["path"], use_container_width=True)
-        
-        st.markdown('<p style="font-size: 0.875rem; font-weight: 600; color: #49454f; margin-bottom: 0.35rem;">Artwork A is:</p>', unsafe_allow_html=True)
-        
+        st.markdown(
+            render_artwork(
+                round_data["image_a"]["path"],
+                round_data["display_label_a"],
+            ),
+            unsafe_allow_html=True,
+        )
+
+        st.markdown(
+            '<p style="font-size: 0.875rem; font-weight: 600; color: #49454f; margin-bottom: 0.35rem;">Artwork A is:</p>',
+            unsafe_allow_html=True,
+        )
         current_guess_a = st.session_state.get(guess_a_key)
+
         ga_col1, ga_col2 = st.columns(2, gap="small")
-        
         with ga_col1:
-            if st.button("Human-Made", key=f"btn_ga_h_{current_round}", use_container_width=True, type="primary" if current_guess_a == "Human-Made" else "secondary"):
+            if st.button(
+                "Human-Made",
+                key=f"btn_ga_h_{current_round}",
+                use_container_width=True,
+                type="primary" if current_guess_a == "Human-Made" else "secondary",
+            ):
                 st.session_state[guess_a_key] = "Human-Made"
+                st.rerun()
         with ga_col2:
-            if st.button("AI-Generated", key=f"btn_ga_ai_{current_round}", use_container_width=True, type="primary" if current_guess_a == "AI-Generated" else "secondary"):
+            if st.button(
+                "AI-Generated",
+                key=f"btn_ga_ai_{current_round}",
+                use_container_width=True,
+                type="primary" if current_guess_a == "AI-Generated" else "secondary",
+            ):
                 st.session_state[guess_a_key] = "AI-Generated"
+                st.rerun()
 
     with col_b:
         st.markdown('<div class="card-title">Artwork B</div>', unsafe_allow_html=True)
-        st.markdown(f'<span class="meta-tag">Catalog: {round_data["display_label_b"]}</span>', unsafe_allow_html=True)
-        
-        st.image(round_data["image_b"]["path"], use_container_width=True)
-        
-        st.markdown('<p style="font-size: 0.875rem; font-weight: 600; color: #49454f; margin-bottom: 0.35rem;">Artwork B is:</p>', unsafe_allow_html=True)
-        
+        st.markdown(
+            render_artwork(
+                round_data["image_b"]["path"],
+                round_data["display_label_b"],
+            ),
+            unsafe_allow_html=True,
+        )
+
+        st.markdown(
+            '<p style="font-size: 0.875rem; font-weight: 600; color: #49454f; margin-bottom: 0.35rem;">Artwork B is:</p>',
+            unsafe_allow_html=True,
+        )
         current_guess_b = st.session_state.get(guess_b_key)
+
         gb_col1, gb_col2 = st.columns(2, gap="small")
-        
         with gb_col1:
-            if st.button("Human-Made", key=f"btn_gb_h_{current_round}", use_container_width=True, type="primary" if current_guess_b == "Human-Made" else "secondary"):
+            if st.button(
+                "Human-Made",
+                key=f"btn_gb_h_{current_round}",
+                use_container_width=True,
+                type="primary" if current_guess_b == "Human-Made" else "secondary",
+            ):
                 st.session_state[guess_b_key] = "Human-Made"
+                st.rerun()
         with gb_col2:
-            if st.button("AI-Generated", key=f"btn_gb_ai_{current_round}", use_container_width=True, type="primary" if current_guess_b == "AI-Generated" else "secondary"):
+            if st.button(
+                "AI-Generated",
+                key=f"btn_gb_ai_{current_round}",
+                use_container_width=True,
+                type="primary" if current_guess_b == "AI-Generated" else "secondary",
+            ):
                 st.session_state[guess_b_key] = "AI-Generated"
+                st.rerun()
 
     st.divider()
 
+    # Preference selection & submission bar
     pref_col, btn_col = st.columns([1.3, 1], gap="medium", vertical_alignment="center")
 
     with pref_col:
-        st.markdown('<p style="font-size: 0.875rem; font-weight: 600; color: #49454f; margin-bottom: 0.35rem;">Preferred Artwork:</p>', unsafe_allow_html=True)
+        st.markdown(
+            '<p style="font-size: 0.875rem; font-weight: 600; color: #49454f; margin-bottom: 0.35rem;">Preferred Artwork:</p>',
+            unsafe_allow_html=True,
+        )
         current_pref = st.session_state.get(pref_key)
 
         p_col1, p_col2 = st.columns(2, gap="small")
         with p_col1:
-            if st.button("Artwork A", key=f"btn_pref_a_{current_round}", use_container_width=True, type="primary" if current_pref == "Artwork A" else "secondary"):
+            if st.button(
+                "Artwork A",
+                key=f"btn_pref_a_{current_round}",
+                use_container_width=True,
+                type="primary" if current_pref == "Artwork A" else "secondary",
+            ):
                 st.session_state[pref_key] = "Artwork A"
+                st.rerun()
         with p_col2:
-            if st.button("Artwork B", key=f"btn_pref_b_{current_round}", use_container_width=True, type="primary" if current_pref == "Artwork B" else "secondary"):
+            if st.button(
+                "Artwork B",
+                key=f"btn_pref_b_{current_round}",
+                use_container_width=True,
+                type="primary" if current_pref == "Artwork B" else "secondary",
+            ):
                 st.session_state[pref_key] = "Artwork B"
+                st.rerun()
 
+    # Check if all questions on this page are completed
     current_guess_a = st.session_state.get(guess_a_key)
     current_guess_b = st.session_state.get(guess_b_key)
     current_pref = st.session_state.get(pref_key)
-    all_answered = (current_guess_a is not None) and (current_guess_b is not None) and (current_pref is not None)
+    all_answered = (
+        (current_guess_a is not None)
+        and (current_guess_b is not None)
+        and (current_pref is not None)
+    )
 
     with btn_col:
         st.write("")
@@ -601,7 +844,10 @@ if st.session_state.page == "experiment":
         if current_round == NUM_ROUNDS:
             try:
                 df_temp = pd.DataFrame(st.session_state.results)
-                total_correct = int(df_temp["guess_A_correct"].sum() + df_temp["guess_B_correct"].sum())
+                total_correct = int(
+                    df_temp["guess_A_correct"].sum() + df_temp["guess_B_correct"].sum()
+                )
+
                 accuracy = float((total_correct / (NUM_ROUNDS * 2)) * 100)
                 payload = {
                     "pre_study": st.session_state.pre_study,
@@ -609,6 +855,7 @@ if st.session_state.page == "experiment":
                     "total_correct": total_correct,
                     "results": st.session_state.results,
                 }
+
                 requests.post(WEB_APP_URL, json=payload, timeout=10)
             except Exception:
                 pass
@@ -619,6 +866,7 @@ if st.session_state.page == "experiment":
         else:
             st.session_state.page = "results"
         st.rerun()
+
 
 # ---------------------------------------------------------
 # 4. RESULTS PAGE
