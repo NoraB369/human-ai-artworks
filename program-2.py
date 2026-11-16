@@ -40,11 +40,11 @@ st.markdown(
         color: #1d1b20 !important;
     }
 
-    /* Container layout */
+    /* Container layout - tighter top/bottom padding to maximize vertical space */
     .block-container {
-        padding-top: 1.5rem !important;
-        padding-bottom: 2rem !important;
-        max-width: 1100px !important;
+        padding-top: 1rem !important;
+        padding-bottom: 0.75rem !important;
+        max-width: 1200px !important;
     }
 
     /* Typography hierarchy */
@@ -54,7 +54,7 @@ st.markdown(
     }
 
     div[data-testid="stVerticalBlock"] {
-        gap: 0.5rem !important;
+        gap: 0.4rem !important;
     }
 
     /* Container Box Styling for questionnaire items */
@@ -111,17 +111,19 @@ st.markdown(
         display: none !important;
     }
 
-    /* Artwork display with controlled height to prevent overlap */
+    /* Artwork display: dynamically fill available viewport height without scrolling */
     [data-testid="stImage"] {
         display: flex;
         justify-content: center;
         align-items: center;
-        margin-top: 0.2rem;
-        margin-bottom: 0.6rem;
+        margin-top: 0.15rem;
+        margin-bottom: 0.35rem;
     }
     [data-testid="stImage"] img {
-        max-height: min(26vh, 220px) !important;
-        width: 100% !important;
+        max-height: clamp(220px, calc(100vh - 340px), 65vh) !important;
+        max-width: 100% !important;
+        width: auto !important;
+        height: auto !important;
         object-fit: contain;
         border-radius: 12px;
         box-shadow: 0 3px 12px rgba(29, 27, 32, 0.08);
@@ -134,13 +136,13 @@ st.markdown(
         letter-spacing: 0.05em;
         color: #49454f !important;
         text-transform: uppercase;
-        margin-bottom: 0.2rem;
+        margin-bottom: 0.15rem;
     }
     .card-title {
         font-size: 1.1rem;
         font-weight: 600;
         color: #1d1b20 !important;
-        margin-bottom: 0.2rem;
+        margin-bottom: 0.15rem;
     }
     .meta-tag {
         display: inline-block;
@@ -151,7 +153,7 @@ st.markdown(
         border-radius: 6px;
         background: #e8def8;
         color: #1d192b !important;
-        margin-bottom: 0.4rem;
+        margin-bottom: 0.25rem;
     }
 
     /* Material 3 Progress Bar */
@@ -169,7 +171,7 @@ st.markdown(
         background-color: #6750a4 !important;
         color: #ffffff !important;
         border-radius: 16px !important;
-        height: 42px !important;
+        height: 40px !important;
         font-weight: 500 !important;
         font-size: 0.9rem !important;
         border: none !important;
@@ -191,7 +193,7 @@ st.markdown(
         color: #1d1b20 !important;
         border: 1px solid #cac4d0 !important;
         border-radius: 16px !important;
-        height: 40px !important;
+        height: 38px !important;
         font-weight: 500 !important;
         font-size: 0.9rem !important;
         transition: all 0.2s ease !important;
@@ -527,7 +529,7 @@ if st.session_state.page == "experiment":
         )
         st.image(round_data["image_a"]["path"], use_container_width=True)
         
-        st.markdown('<div style="margin-top: 0.75rem; margin-bottom: 0.4rem; font-size: 0.85rem; font-weight: 500; color: #49454f;">Artwork A is:</div>', unsafe_allow_html=True)
+        st.markdown('<div style="margin-top: 0.35rem; margin-bottom: 0.25rem; font-size: 0.85rem; font-weight: 500; color: #49454f;">Artwork A is:</div>', unsafe_allow_html=True)
         current_guess_a = st.session_state.get(guess_a_key)
         
         ga_col1, ga_col2 = st.columns(2, gap="small")
@@ -548,7 +550,7 @@ if st.session_state.page == "experiment":
         )
         st.image(round_data["image_b"]["path"], use_container_width=True)
         
-        st.markdown('<div style="margin-top: 0.75rem; margin-bottom: 0.4rem; font-size: 0.85rem; font-weight: 500; color: #49454f;">Artwork B is:</div>', unsafe_allow_html=True)
+        st.markdown('<div style="margin-top: 0.35rem; margin-bottom: 0.25rem; font-size: 0.85rem; font-weight: 500; color: #49454f;">Artwork B is:</div>', unsafe_allow_html=True)
         current_guess_b = st.session_state.get(guess_b_key)
         
         gb_col1, gb_col2 = st.columns(2, gap="small")
@@ -561,13 +563,13 @@ if st.session_state.page == "experiment":
                 st.session_state[guess_b_key] = "AI-Generated"
                 st.rerun()
 
-    st.markdown('<hr style="margin: 1rem 0 0.75rem 0; border: none; border-top: 1px solid #e7e0ec;">', unsafe_allow_html=True)
+    st.markdown('<hr style="margin: 0.5rem 0 0.45rem 0; border: none; border-top: 1px solid #e7e0ec;">', unsafe_allow_html=True)
 
     # Preference selection & submission bar
     pref_col, btn_col = st.columns([1.3, 1], gap="large", vertical_alignment="center")
 
     with pref_col:
-        st.markdown('<div style="margin-bottom: 0.4rem; font-size: 0.85rem; font-weight: 500; color: #49454f;">Preferred Artwork:</div>', unsafe_allow_html=True)
+        st.markdown('<div style="margin-bottom: 0.25rem; font-size: 0.85rem; font-weight: 500; color: #49454f;">Preferred Artwork:</div>', unsafe_allow_html=True)
         current_pref = st.session_state.get(pref_key)
         
         p_col1, p_col2 = st.columns(2, gap="small")
