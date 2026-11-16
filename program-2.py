@@ -1,3 +1,5 @@
+import base64
+from io import BytesIO
 import json
 import os
 import random
@@ -19,7 +21,7 @@ SUPPORTED_EXTENSIONS = (".jpg", ".jpeg", ".png")
 st.set_page_config(
     page_title="Artwork Perception Study",
     page_icon="🎨",
-    layout="centered",
+    layout="wide",
     initial_sidebar_state="collapsed",
 )
 
@@ -42,9 +44,9 @@ st.markdown(
 
     /* Container layout */
     .block-container {
-        padding-top: 3.5rem !important;
-        padding-bottom: 4rem !important;
-        max-width: 960px !important;
+        padding-top: 1.5rem !important;
+        padding-bottom: 2rem !important;
+        max-width: 1080px !important;
     }
 
     /* Typography hierarchy */
@@ -53,56 +55,151 @@ st.markdown(
         font-family: "Roboto", system-ui, -apple-system, sans-serif !important;
     }
 
-    /* Remove default boxed borders */
-    [data-testid="stVerticalBlockBorderWrapper"] {
-        border: none !important;
-        box-shadow: none !important;
-        background: transparent !important;
-        padding: 0 !important;
+    div[data-testid="stVerticalBlock"] {
+        gap: 0.55rem;
     }
 
-    /* Large artwork display with M3 Elevation */
-    [data-testid="stImage"] {
+    /* Question Cards (Bordered Containers) */
+    [data-testid="stVerticalBlockBorderWrapper"] {
+        border: 1px solid #d5cedb !important;
+        border-radius: 12px !important;
+        background: #ffffff !important;
+        padding: 12px 14px !important;
+        margin-bottom: 6px !important;
+        box-shadow: none !important;
+    }
+
+    /* Questionnaire Text Inputs */
+    .stTextInput input {
+        background: #ffffff !important;
+        border: 1px solid #cac4d0 !important;
+        border-radius: 10px !important;
+        min-height: 42px !important;
+        color: #1d1b20 !important;
+    }
+    .stTextInput input:focus {
+        border-color: #6750a4 !important;
+        box-shadow: 0 0 0 2px #6750a422 !important;
+    }
+
+    /* Consistent Numbered 1–5 Response Chips */
+    [data-testid="stRadio"] [role="radiogroup"] {
+        display: flex !important;
+        flex-direction: row !important;
+        flex-wrap: nowrap !important;
+        gap: 8px !important;
+        justify-content: space-between !important;
+    }
+
+    [data-testid="stRadio"] [role="radiogroup"] label {
+        background: #f5f1f8 !important;
+        border: 1px solid #ded6e7 !important;
+        border-radius: 8px !important;
+        padding: 6px 8px !important;
+        min-width: 0 !important;
+        flex: 1 !important;
+        justify-content: center !important;
+        transition: 0.15s ease;
+    }
+
+    [data-testid="stRadio"] [role="radiogroup"] label:hover {
+        background: #eaddff !important;
+        border-color: #6750a4 !important;
+    }
+
+    [data-testid="stRadio"] [role="radiogroup"] label:has(input:checked) {
+        background: #eaddff !important;
+        border: 1.5px solid #6750a4 !important;
+    }
+
+    [data-testid="stRadio"] [role="radiogroup"] label p {
+        font-size: 0.9rem !important;
+        font-weight: 700 !important;
+        color: #381e72 !important;
+        margin: 0 !important;
+        text-align: center !important;
+    }
+
+    [data-testid="stRadio"] input {
+        accent-color: #6750a4 !important;
+    }
+
+    /* Artwork Display Frame with Bottom-Right Label */
+    .artwork-frame {
+        position: relative;
+        width: 100%;
+        height: min(40vh, 360px);
         display: flex;
         justify-content: center;
         align-items: center;
-        margin-top: 0.75rem;
-        margin-bottom: 1rem;
+        margin-top: 0.25rem;
+        margin-bottom: 0.5rem;
+        overflow: hidden;
+        border-radius: 14px;
+        background: #f7f2fa;
     }
-    [data-testid="stImage"] img {
-        max-height: min(55vh, 480px) !important;
-        width: 100% !important;
+
+    .artwork-frame img {
+        width: 100%;
+        height: 100%;
         object-fit: contain;
-        border-radius: 16px;
+        border-radius: 14px;
         box-shadow: 0 4px 16px rgba(29, 27, 32, 0.08);
+    }
+
+    .artwork-tag {
+        position: absolute;
+        right: 12px;
+        bottom: 12px;
+        z-index: 2;
+        display: inline-block;
+        padding: 5px 12px;
+        background: #e8def8;
+        color: #1d192b !important;
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        border-radius: 8px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.14);
     }
 
     /* M3 Typography & Metadata Tokens */
     .round-indicator {
         font-size: 0.85rem;
-        font-weight: 500;
+        font-weight: 600;
         letter-spacing: 0.05em;
         color: #49454f !important;
         text-transform: uppercase;
         margin-bottom: 0.25rem;
     }
     .card-title {
-        font-size: 1.25rem;
-        font-weight: 500;
+        font-size: 1.2rem;
+        font-weight: 600;
         letter-spacing: 0em;
         color: #1d1b20 !important;
-        margin-bottom: 0.25rem;
+        margin-bottom: 0.2rem;
     }
     .meta-tag {
         display: inline-block;
         font-size: 0.75rem;
-        font-weight: 500;
-        letter-spacing: 0.02em;
+        font-weight: 600;
+        letter-spacing: 0.03em;
         padding: 4px 12px;
         border-radius: 8px;
         background: #e8def8;
         color: #1d192b !important;
         margin-bottom: 0.5rem;
+    }
+    .section-heading {
+        font-size: 1.1rem;
+        font-weight: 650;
+        color: #1d1b20 !important;
+        margin: 0.4rem 0 0.1rem 0;
+    }
+    .section-description {
+        font-size: 0.85rem;
+        color: #49454f !important;
+        margin-bottom: 0.6rem;
     }
 
     /* Material 3 Progress Bar */
@@ -120,7 +217,7 @@ st.markdown(
         background-color: #6750a4 !important;
         color: #ffffff !important;
         border-radius: 20px !important;
-        height: 48px !important;
+        height: 46px !important;
         font-weight: 500 !important;
         font-size: 0.95rem !important;
         letter-spacing: 0.01em !important;
@@ -140,15 +237,15 @@ st.markdown(
         font-weight: 500 !important;
     }
 
-    /* Secondary Choice Buttons (Unselected/Selected Choice Chips) - Clear contrast */
+    /* Secondary Choice Buttons (Unselected Choice Chips) */
     div.stButton > button[kind="secondary"] {
         background-color: #f3edf7 !important;
         color: #1d1b20 !important;
         border: 1px solid #cac4d0 !important;
         border-radius: 20px !important;
-        height: 46px !important;
+        height: 44px !important;
         font-weight: 500 !important;
-        font-size: 0.95rem !important;
+        font-size: 0.92rem !important;
         transition: all 0.2s ease !important;
         width: 100% !important;
         box-shadow: none !important;
@@ -160,7 +257,7 @@ st.markdown(
     div.stButton > button[kind="secondary"] p, 
     div.stButton > button[kind="secondary"] span {
         color: #1d1b20 !important;
-        font-size: 0.95rem !important;
+        font-size: 0.92rem !important;
         font-weight: 500 !important;
     }
 
@@ -175,61 +272,21 @@ st.markdown(
         color: #1d1b2061 !important;
     }
 
-    /* Material Design 3 dropdown styling */
-    .stSelectbox div[data-baseweb="select"] > div {
-        background-color: #ffffff !important;
-        color: #1d1b20 !important;
-        border: 1px solid #cac4d0 !important;
-    }
-    
-    div[role="listbox"] {
-        background-color: #ffffff !important;
-    }
-    
-    div[role="option"] {
-        color: #1d1b20 !important;
-        background-color: #ffffff !important;
-    }
-    
-    div[role="option"]:hover {
-        background-color: #f3edf7 !important;
-    }
-
-    /* Short-answer text box */
-    .stTextArea textarea {
-        color: #ffffff !important;
-        background-color: #2b2b2b !important;
-        caret-color: #ffffff !important;
-    }
-    
-    /* Placeholder text */
-    .stTextArea textarea::placeholder {
-        color: #cccccc !important;
-    }
-
-    /* Streamlit dataframe */
-    [data-testid="stDataFrame"] * {
-        color: white !important;
-    }
-    
-    /* AG Grid cells */
-    .ag-cell {
-        color: white !important;
-    }
-    
-    /* AG Grid headers */
-    .ag-header-cell-text {
-        color: white !important;
-    }
-    
-    /* Expander content */
-    [data-testid="stExpander"] * {
-        color: white !important;
+    /* Responsive adjustments for smaller laptop viewports */
+    @media (min-width: 769px) and (max-height: 820px) {
+        .artwork-frame {
+            height: 31vh !important;
+        }
+        .block-container {
+            padding-top: 0.75rem !important;
+            padding-bottom: 0.75rem !important;
+        }
     }
     </style>
 """,
     unsafe_allow_html=True,
 )
+
 
 # ---------------------------------------------------------
 # DATASET HELPERS
@@ -247,9 +304,34 @@ def load_dataset():
     for filename in os.listdir(AI_DIR):
         if filename.lower().endswith(SUPPORTED_EXTENSIONS):
             images.append(
-                {"path": os.path.join(AI_DIR, filename), "true_type": "AI-Generated"}
+                {
+                    "path": os.path.join(AI_DIR, filename),
+                    "true_type": "AI-Generated",
+                }
             )
     return images
+
+
+def render_artwork(path, displayed_label):
+    """Render artwork with an AI/Human tag in its bottom-right corner."""
+    short_label = "AI" if displayed_label == "AI-Generated" else "Human"
+
+    with Image.open(path) as source:
+        artwork = source.copy()
+        artwork.thumbnail((1600, 1200))
+
+        buffer = BytesIO()
+        artwork.save(buffer, format="PNG")
+
+    encoded_image = base64.b64encode(buffer.getvalue()).decode("utf-8")
+
+    return f"""
+        <div class="artwork-frame">
+            <img src="data:image/png;base64,{encoded_image}" alt="Artwork" />
+            <span class="artwork-tag">{short_label}</span>
+        </div>
+    """
+
 
 BASE_CONDITIONS = [
     ("HXH", "correct"),
@@ -276,11 +358,15 @@ human_images = [img for img in ALL_IMAGES if img["true_type"] == "Human-Made"]
 ai_images = [img for img in ALL_IMAGES if img["true_type"] == "AI-Generated"]
 
 if len(human_images) < NUM_ROUNDS or len(ai_images) < NUM_ROUNDS:
-    st.error("Insufficient images: minimum 10 human-made and 10 AI-generated images required.")
+    st.error(
+        f"Insufficient images: minimum {NUM_ROUNDS} human-made and {NUM_ROUNDS} AI-generated images required."
+    )
     st.stop()
+
 
 def opposite_label(label):
     return "AI-Generated" if label == "Human-Made" else "Human-Made"
+
 
 def assign_labels(truth_a, truth_b, label_condition):
     if label_condition == "correct":
@@ -291,6 +377,7 @@ def assign_labels(truth_a, truth_b, label_condition):
         if random.choice([True, False]):
             return opposite_label(truth_a), truth_b
         return truth_a, opposite_label(truth_b)
+
 
 def generate_round():
     pair_type, label_condition = st.session_state.conditions.pop()
@@ -319,6 +406,7 @@ def generate_round():
         "display_label_b": label_b,
     }
 
+
 def reset_session():
     st.session_state.page = "intro"
     st.session_state.round = 1
@@ -332,14 +420,16 @@ def reset_session():
     random.shuffle(st.session_state.conditions)
     st.session_state.current_round = generate_round()
 
+
 # ---------------------------------------------------------
 # STATE INITIALIZATION
 # ---------------------------------------------------------
 if "page" not in st.session_state:
     reset_session()
 
+
 # ---------------------------------------------------------
-# 1. INTRO PAGE
+# 1. INTRO PAGE (ORIGINAL SCREEN — UNCHANGED)
 # ---------------------------------------------------------
 if st.session_state.page == "intro":
     st.markdown('<span class="meta-tag">Research Study</span>', unsafe_allow_html=True)
@@ -364,385 +454,223 @@ if st.session_state.page == "intro":
 
     st.stop()
 
+
 # ---------------------------------------------------------
-# 2. PRE-STUDY QUESTIONNAIRE
+# 2. PRE-STUDY QUESTIONNAIRE (REDESIGNED UI)
 # ---------------------------------------------------------
 if st.session_state.page == "pre_study":
+    LIKERT_OPTIONS = {
+        1: "Strongly agree",
+        2: "Agree",
+        3: "Neutral",
+        4: "Disagree",
+        5: "Strongly disagree",
+    }
+
+    ATTITUDE_QUESTIONS = [
+        "For routine transactions, I would rather interact with an artificially intelligent system than with a human.",
+        "Artificial Intelligence can provide new economic opportunities for this country.",
+        "Organizations use Artificial Intelligence unethically.",
+        "Artificially intelligent systems can help people feel happier.",
+        "I am impressed by what Artificial Intelligence can do.",
+        "I think artificially intelligent systems make many errors.",
+        "I am interested in using artificially intelligent systems in my daily life.",
+        "I find Artificial Intelligence sinister.",
+        "Artificial Intelligence might take control of people.",
+        "I think Artificial Intelligence is dangerous.",
+        "Artificial Intelligence can have positive impacts on people’s wellbeing.",
+        "Artificial Intelligence is exciting.",
+        "I would be grateful if you could select 'Disagree' option.",
+        "An artificially intelligent agent would be better than an employee in many routine jobs.",
+        "There are many beneficial applications of Artificial Intelligence.",
+        "I shiver with discomfort when I think about future uses of Artificial Intelligence.",
+        "Artificially intelligent systems can perform better than humans.",
+        "Much of society will benefit from a future full of Artificial Intelligence.",
+        "I would like to use Artificial Intelligence in my own job.",
+        "People like me will suffer if Artificial Intelligence is used more and more.",
+        "Artificial Intelligence is used to spy on people.",
+    ]
+
     st.markdown(
         '<span class="meta-tag">Pre-Study Questionnaire</span>',
-        unsafe_allow_html=True
+        unsafe_allow_html=True,
     )
-
     st.subheader("Before We Begin")
     st.write(
-        "Please answer the following questions "
-        "before starting the artwork evaluation."
-    )
-    # ----------------------------------
-    # Short Response Questions
-    # ----------------------------------
-    age = st.text_area(
-        "How old are you?",
-        height=50
-    )
-    gender = st.text_area(
-        "What is your gender?",
-        height=50
-    )
-
-    major = st.text_area(
-        "What is your major?",
-        height=50
-    )
-    # ----------------------------------
-    # Multiple Choice Questions
-    # ----------------------------------
-    attitude_1 = st.selectbox(
-        "For routine transactions, I would rather interact with an artificially intelligent system than with a human.",
-        [
-            "Strongly agree",
-            "Agree",
-            "Neutral",
-            "Disagree",
-            "Strongly disagree",
-        ],
-        index=None,
-    )
-
-    attitude_2 = st.selectbox(
-        "Artificial Intelligence can provide new economic opportunities for this country.",
-        [
-            "Strongly agree",
-            "Agree",
-            "Neutral",
-            "Disagree",
-            "Strongly disagree",
-        ],
-        index=None,
-    )
-
-    attitude_3 = st.selectbox(
-        "Organizations use Artificial Intelligence unethically.",
-        [
-            "Strongly agree",
-            "Agree",
-            "Neutral",
-            "Disagree",
-            "Strongly disagree",
-        ],
-        index=None,
-    )
-
-    attitude_4 = st.selectbox(
-        "Artificially intelligent systems can help people feel happier.",
-        [
-            "Strongly agree",
-            "Agree",
-            "Neutral",
-            "Disagree",
-            "Strongly disagree",
-        ],
-        index=None,
-    )
-
-    attitude_5 = st.selectbox(
-        "I am impressed by what Artificial Intelligence can do.",
-        [
-            "Strongly agree",
-            "Agree",
-            "Neutral",
-            "Disagree",
-            "Strongly disagree",
-        ],
-        index=None,
-    )
-
-    attitude_6 = st.selectbox(
-        "I think artificially intelligent systems make many errors.",
-        [
-            "Strongly agree",
-            "Agree",
-            "Neutral",
-            "Disagree",
-            "Strongly disagree",
-        ],
-        index=None,
-    )
-
-    attitude_7 = st.selectbox(
-        "I am interested in using artificially intelligent systems in my daily life.",
-        [
-            "Strongly agree",
-            "Agree",
-            "Neutral",
-            "Disagree",
-            "Strongly disagree",
-        ],
-        index=None,
-    )
-
-    attitude_8 = st.selectbox(
-        "I find Artificial Intelligence sinister.",
-        [
-            "Strongly agree",
-            "Agree",
-            "Neutral",
-            "Disagree",
-            "Strongly disagree",
-        ],
-        index=None,
-    )
-
-    attitude_9 = st.selectbox(
-        "Artificial Intelligence might take control of people.",
-        [
-            "Strongly agree",
-            "Agree",
-            "Neutral",
-            "Disagree",
-            "Strongly disagree",
-        ],
-        index=None,
-    )
-
-    attitude_10 = st.selectbox(
-        "I think Artificial Intelligence is dangerous.",
-        [
-            "Strongly agree",
-            "Agree",
-            "Neutral",
-            "Disagree",
-            "Strongly disagree",
-        ],
-        index=None,
-    )
-
-    attitude_11 = st.selectbox(
-        "Artificial Intelligence can have positive impacts on people’s wellbeing.",
-        [
-            "Strongly agree",
-            "Agree",
-            "Neutral",
-            "Disagree",
-            "Strongly disagree",
-        ],
-        index=None,
-    )
-
-    attitude_12 = st.selectbox(
-        "Artificial Intelligence is exciting.",
-        [
-            "Strongly agree",
-            "Agree",
-            "Neutral",
-            "Disagree",
-            "Strongly disagree",
-        ],
-        index=None,
-    )
-
-    attitude_13 = st.selectbox(
-        "I would be grateful if you could select 'Disagree' option.",
-        [
-            "Strongly agree",
-            "Agree",
-            "Neutral",
-            "Disagree",
-            "Strongly disagree",
-        ],
-        index=None,
-    )
-
-    attitude_14 = st.selectbox(
-        "An artificially intelligent agent would be better than an employee in many routine jobs.",
-        [
-            "Strongly agree",
-            "Agree",
-            "Neutral",
-            "Disagree",
-            "Strongly disagree",
-        ],
-        index=None,
-    )
-
-    attitude_15 = st.selectbox(
-        "There are many beneficial applications of Artificial Intelligence.",
-        [
-            "Strongly agree",
-            "Agree",
-            "Neutral",
-            "Disagree",
-            "Strongly disagree",
-        ],
-        index=None,
-    )
-
-    attitude_16 = st.selectbox(
-        "I shiver with discomfort when I think about future uses of Artificial Intelligence.",
-        [
-            "Strongly agree",
-            "Agree",
-            "Neutral",
-            "Disagree",
-            "Strongly disagree",
-        ],
-        index=None,
-    )
-
-    attitude_17 = st.selectbox(
-        "Artificially intelligent systems can perform better than humans.",
-        [
-            "Strongly agree",
-            "Agree",
-            "Neutral",
-            "Disagree",
-            "Strongly disagree",
-        ],
-        index=None,
-    )
-
-    attitude_18 = st.selectbox(
-        "Much of society will benefit from a future full of Artificial Intelligence.",
-        [
-            "Strongly agree",
-            "Agree",
-            "Neutral",
-            "Disagree",
-            "Strongly disagree",
-        ],
-        index=None,
-    )
-
-    attitude_19 = st.selectbox(
-        "I would like to use Artificial Intelligence in my own job.",
-        [
-            "Strongly agree",
-            "Agree",
-            "Neutral",
-            "Disagree",
-            "Strongly disagree",
-        ],
-        index=None,
-    )
-
-    attitude_20 = st.selectbox(
-        "People like me will suffer if Artificial Intelligence is used more and more.",
-        [
-            "Strongly agree",
-            "Agree",
-            "Neutral",
-            "Disagree",
-            "Strongly disagree",
-        ],
-        index=None,
-    )
-
-    attitude_21 = st.selectbox(
-        "Artificial Intelligence is used to spy on people.",
-        [
-            "Strongly agree",
-            "Agree",
-            "Neutral",
-            "Disagree",
-            "Strongly disagree",
-        ],
-        index=None,
-    )
-    # ----------------------------------
-    # Likert Scale
-    # ----------------------------------
-    confidence = st.slider(
-        "I am confident in my ability to detect when something is generated by AI. ",
-        1,
-        5,
-        3,
-        help="1 = Not confident, 5 = Extremely confident"
-    )
-    # ----------------------------------
-    # Short Response Questions (Cont.)
-    # ----------------------------------
-    accuracy = st.text_area(
-        "How accurate do you think you will be in selecting the AI-generated image? (0%-100% scale)",
-        height=50
+        "Please answer the following questions before starting the artwork evaluation."
     )
 
     # ----------------------------------
-    # Check if all questions are answered
+    # Section 1: Demographics
     # ----------------------------------
+    st.markdown(
+        '<div class="section-heading">01 &nbsp; About You</div>'
+        '<div class="section-description">A few basic background questions.</div>',
+        unsafe_allow_html=True,
+    )
+
+    c1, c2, c3 = st.columns(3, gap="medium")
+    with c1:
+        age = st.text_input("How old are you?", placeholder="e.g. 24", key="age_input")
+    with c2:
+        gender = st.text_input("What is your gender?", placeholder="Your gender", key="gender_input")
+    with c3:
+        major = st.text_input("What is your major?", placeholder="e.g. Design", key="major_input")
+
+    st.divider()
+
+    # ----------------------------------
+    # Section 2: AI Attitude Statements
+    # ----------------------------------
+    st.markdown(
+        '<div class="section-heading">02 &nbsp; Your Views on AI</div>'
+        '<div class="section-description">'
+        "How much do you agree or disagree with each statement? Select one number per question "
+        "(1 = Strongly agree · 2 = Agree · 3 = Neutral · 4 = Disagree · 5 = Strongly disagree)."
+        "</div>",
+        unsafe_allow_html=True,
+    )
+
+    left_col, right_col = st.columns(2, gap="medium")
+
+    for i, question in enumerate(ATTITUDE_QUESTIONS):
+        question_number = i + 1
+        target_col = left_col if i < 11 else right_col
+
+        with target_col:
+            with st.container(border=True):
+                # Number and question inside the box above the options
+                st.markdown(
+                    f"""
+                    <div style="
+                        font-size:11px;
+                        color:#6750a4;
+                        font-weight:700;
+                        letter-spacing:0.05em;
+                        margin-bottom:4px;">
+                        QUESTION {question_number:02d}
+                    </div>
+                    <div style="
+                        font-size:13.5px;
+                        font-weight:500;
+                        line-height:1.45;
+                        color:#1d1b20;
+                        margin-bottom:10px;">
+                        {question}
+                    </div>
+                    """,
+                    unsafe_allow_html=True,
+                )
+
+                st.radio(
+                    f"Response to question {question_number}",
+                    options=list(LIKERT_OPTIONS.keys()),
+                    format_func=lambda x: str(x),
+                    horizontal=True,
+                    index=None,
+                    label_visibility="collapsed",
+                    key=f"attitude_choice_{question_number}",
+                )
+
+                # Scale anchor labels directly below options inside the box
+                st.markdown(
+                    """
+                    <div style="
+                        display:flex;
+                        justify-content:space-between;
+                        font-size:10px;
+                        color:#49454f;
+                        margin-top:4px;
+                        padding:0 2px;">
+                        <span>Strongly agree</span>
+                        <span>Agree</span>
+                        <span>Neutral</span>
+                        <span>Disagree</span>
+                        <span>Strongly disagree</span>
+                    </div>
+                    """,
+                    unsafe_allow_html=True,
+                )
+
+    st.divider()
+
+    # ----------------------------------
+    # Section 3: Confidence & Accuracy
+    # ----------------------------------
+    st.markdown(
+        '<div class="section-heading">03 &nbsp; AI Detection Confidence</div>'
+        '<div class="section-description">Before viewing the artworks, tell us what you expect.</div>',
+        unsafe_allow_html=True,
+    )
+
+    with st.container(border=True):
+        confidence = st.slider(
+            "I am confident in my ability to detect when something is generated by AI.",
+            min_value=1,
+            max_value=5,
+            value=3,
+            key="confidence_input",
+        )
+        st.caption("1 = Not confident at all  ·  5 = Extremely confident")
+
+        accuracy = st.text_input(
+            "How accurate do you think you will be in selecting the AI-generated image? (0%-100% scale)",
+            placeholder="Enter a percentage from 0 to 100",
+            key="accuracy_input",
+        )
+
+    # ----------------------------------
+    # Validation & Continue
+    # ----------------------------------
+    accuracy_clean = accuracy.strip().replace("%", "")
+    valid_accuracy = accuracy_clean.isdigit() and 0 <= int(accuracy_clean) <= 100
+
     all_answered = (
         age.strip() != ""
         and gender.strip() != ""
         and major.strip() != ""
-        and attitude_1 is not None
-        and attitude_2 is not None
-        and attitude_3 is not None
-        and attitude_4 is not None
-        and attitude_5 is not None
-        and attitude_6 is not None
-        and attitude_7 is not None
-        and attitude_8 is not None
-        and attitude_9 is not None
-        and attitude_10 is not None
-        and attitude_11 is not None
-        and attitude_12 is not None
-        and attitude_13 is not None
-        and attitude_14 is not None
-        and attitude_15 is not None
-        and attitude_16 is not None
-        and attitude_17 is not None
-        and attitude_18 is not None
-        and attitude_19 is not None
-        and attitude_20 is not None
-        and attitude_21 is not None
-        and age.strip() != ""
-        and accuracy.strip() != ""
+        and all(
+            st.session_state.get(f"attitude_choice_{i}") is not None
+            for i in range(1, 22)
+        )
+        and valid_accuracy
     )
-    # ----------------------------------
-    # Continue Button
-    # ----------------------------------
+
+    if not valid_accuracy and accuracy.strip() != "":
+        st.caption("Please enter a valid percentage between 0 and 100.")
+    elif not all_answered:
+        st.caption("Complete all questions above to unlock the next step.")
+
     if st.button(
         "Continue to Study →",
         type="primary",
         use_container_width=True,
-        disabled=not all_answered
+        disabled=not all_answered,
     ):
-        st.session_state.results.append(
+        st.session_state.pre_study = [
             {
                 "age": age,
                 "gender": gender,
                 "major": major,
-                "attitude_1": attitude_1,
-                "attitude_2": attitude_2,
-                "attitude_3": attitude_3,
-                "attitude_4": attitude_4,
-                "attitude_5": attitude_5,
-                "attitude_6": attitude_6,
-                "attitude_7": attitude_7,
-                "attitude_8": attitude_8,
-                "attitude_9": attitude_9,
-                "attitude_10": attitude_10,
-                "attitude_11": attitude_11,
-                "attitude_12": attitude_12,
-                "attitude_13": attitude_13,
-                "attitude_14": attitude_14,
-                "attitude_15": attitude_15,
-                "attitude_16": attitude_16,
-                "attitude_17": attitude_17,
-                "attitude_18": attitude_18,
-                "attitude_19": attitude_19,
-                "attitude_20": attitude_20,
-                "attitude_21": attitude_21,
+                **{
+                    f"attitude_{i}": LIKERT_OPTIONS[
+                        st.session_state[f"attitude_choice_{i}"]
+                    ]
+                    for i in range(1, 22)
+                },
                 "confidence": confidence,
-                "accuracy": accuracy
+                "accuracy": accuracy,
             }
-        )
+        ]
 
         st.session_state.page = "experiment"
         st.rerun()
+
     st.stop()
-    
+
+
 # ---------------------------------------------------------
-# 2. EXPERIMENT PAGE (RESPONSIVE SINGLE-VIEWPORT)
+# 3. EXPERIMENT PAGE (RESPONSIVE SINGLE-VIEWPORT)
 # ---------------------------------------------------------
 if st.session_state.page == "experiment":
     if st.session_state.round > NUM_ROUNDS:
@@ -750,18 +678,18 @@ if st.session_state.page == "experiment":
         st.rerun()
 
     round_data = st.session_state.current_round
+    current_round = st.session_state.round
 
     st.markdown(
-        f'<div class="round-indicator">Round {st.session_state.round} of {NUM_ROUNDS}</div>',
+        f'<div class="round-indicator">Round {current_round} of {NUM_ROUNDS}</div>',
         unsafe_allow_html=True,
     )
-    st.progress(st.session_state.round / NUM_ROUNDS)
-    st.write("")
+    st.progress(current_round / NUM_ROUNDS)
 
     # State keys for current round
-    guess_a_key = f"guess_a_{st.session_state.round}"
-    guess_b_key = f"guess_b_{st.session_state.round}"
-    pref_key = f"pref_{st.session_state.round}"
+    guess_a_key = f"guess_a_{current_round}"
+    guess_b_key = f"guess_b_{current_round}"
+    pref_key = f"pref_{current_round}"
 
     # Side-by-side artwork evaluation
     col_a, col_b = st.columns(2, gap="large")
@@ -769,62 +697,104 @@ if st.session_state.page == "experiment":
     with col_a:
         st.markdown('<div class="card-title">Artwork A</div>', unsafe_allow_html=True)
         st.markdown(
-            f'<span class="meta-tag">Catalog: {round_data["display_label_a"]}</span>',
+            render_artwork(
+                round_data["image_a"]["path"],
+                round_data["display_label_a"],
+            ),
             unsafe_allow_html=True,
         )
-        st.image(round_data["image_a"]["path"], use_container_width=True)
-        
-        st.markdown('<p style="font-size: 0.875rem; font-weight: 500; color: #49454f; margin-bottom: 0.4rem;">Artwork A is:</p>', unsafe_allow_html=True)
+
+        st.markdown(
+            '<p style="font-size: 0.875rem; font-weight: 600; color: #49454f; margin-bottom: 0.35rem;">Artwork A is:</p>',
+            unsafe_allow_html=True,
+        )
         current_guess_a = st.session_state.get(guess_a_key)
-        
-        ga_col1, ga_col2 = st.columns(2)
+
+        ga_col1, ga_col2 = st.columns(2, gap="small")
         with ga_col1:
-            if st.button("Human-Made", key=f"btn_ga_h_{st.session_state.round}", use_container_width=True, type="primary" if current_guess_a == "Human-Made" else "secondary"):
+            if st.button(
+                "Human-Made",
+                key=f"btn_ga_h_{current_round}",
+                use_container_width=True,
+                type="primary" if current_guess_a == "Human-Made" else "secondary",
+            ):
                 st.session_state[guess_a_key] = "Human-Made"
                 st.rerun()
         with ga_col2:
-            if st.button("AI-Generated", key=f"btn_ga_ai_{st.session_state.round}", use_container_width=True, type="primary" if current_guess_a == "AI-Generated" else "secondary"):
+            if st.button(
+                "AI-Generated",
+                key=f"btn_ga_ai_{current_round}",
+                use_container_width=True,
+                type="primary" if current_guess_a == "AI-Generated" else "secondary",
+            ):
                 st.session_state[guess_a_key] = "AI-Generated"
                 st.rerun()
 
     with col_b:
         st.markdown('<div class="card-title">Artwork B</div>', unsafe_allow_html=True)
         st.markdown(
-            f'<span class="meta-tag">Catalog: {round_data["display_label_b"]}</span>',
+            render_artwork(
+                round_data["image_b"]["path"],
+                round_data["display_label_b"],
+            ),
             unsafe_allow_html=True,
         )
-        st.image(round_data["image_b"]["path"], use_container_width=True)
-        
-        st.markdown('<p style="font-size: 0.875rem; font-weight: 500; color: #49454f; margin-bottom: 0.4rem;">Artwork B is:</p>', unsafe_allow_html=True)
+
+        st.markdown(
+            '<p style="font-size: 0.875rem; font-weight: 600; color: #49454f; margin-bottom: 0.35rem;">Artwork B is:</p>',
+            unsafe_allow_html=True,
+        )
         current_guess_b = st.session_state.get(guess_b_key)
-        
-        gb_col1, gb_col2 = st.columns(2)
+
+        gb_col1, gb_col2 = st.columns(2, gap="small")
         with gb_col1:
-            if st.button("Human-Made", key=f"btn_gb_h_{st.session_state.round}", use_container_width=True, type="primary" if current_guess_b == "Human-Made" else "secondary"):
+            if st.button(
+                "Human-Made",
+                key=f"btn_gb_h_{current_round}",
+                use_container_width=True,
+                type="primary" if current_guess_b == "Human-Made" else "secondary",
+            ):
                 st.session_state[guess_b_key] = "Human-Made"
                 st.rerun()
         with gb_col2:
-            if st.button("AI-Generated", key=f"btn_gb_ai_{st.session_state.round}", use_container_width=True, type="primary" if current_guess_b == "AI-Generated" else "secondary"):
+            if st.button(
+                "AI-Generated",
+                key=f"btn_gb_ai_{current_round}",
+                use_container_width=True,
+                type="primary" if current_guess_b == "AI-Generated" else "secondary",
+            ):
                 st.session_state[guess_b_key] = "AI-Generated"
                 st.rerun()
 
-    st.write("")
-    st.write("---")
+    st.divider()
 
     # Preference selection & submission bar
     pref_col, btn_col = st.columns([1.3, 1], gap="medium", vertical_alignment="center")
 
     with pref_col:
-        st.markdown('<p style="font-size: 0.875rem; font-weight: 500; color: #49454f; margin-bottom: 0.4rem;">Preferred Artwork:</p>', unsafe_allow_html=True)
+        st.markdown(
+            '<p style="font-size: 0.875rem; font-weight: 600; color: #49454f; margin-bottom: 0.35rem;">Preferred Artwork:</p>',
+            unsafe_allow_html=True,
+        )
         current_pref = st.session_state.get(pref_key)
-        
-        p_col1, p_col2 = st.columns(2)
+
+        p_col1, p_col2 = st.columns(2, gap="small")
         with p_col1:
-            if st.button("Artwork A", key=f"btn_pref_a_{st.session_state.round}", use_container_width=True, type="primary" if current_pref == "Artwork A" else "secondary"):
+            if st.button(
+                "Artwork A",
+                key=f"btn_pref_a_{current_round}",
+                use_container_width=True,
+                type="primary" if current_pref == "Artwork A" else "secondary",
+            ):
                 st.session_state[pref_key] = "Artwork A"
                 st.rerun()
         with p_col2:
-            if st.button("Artwork B", key=f"btn_pref_b_{st.session_state.round}", use_container_width=True, type="primary" if current_pref == "Artwork B" else "secondary"):
+            if st.button(
+                "Artwork B",
+                key=f"btn_pref_b_{current_round}",
+                use_container_width=True,
+                type="primary" if current_pref == "Artwork B" else "secondary",
+            ):
                 st.session_state[pref_key] = "Artwork B"
                 st.rerun()
 
@@ -832,16 +802,20 @@ if st.session_state.page == "experiment":
     current_guess_a = st.session_state.get(guess_a_key)
     current_guess_b = st.session_state.get(guess_b_key)
     current_pref = st.session_state.get(pref_key)
-    all_answered = (current_guess_a is not None) and (current_guess_b is not None) and (current_pref is not None)
+    all_answered = (
+        (current_guess_a is not None)
+        and (current_guess_b is not None)
+        and (current_pref is not None)
+    )
 
     with btn_col:
         st.write("")
         submit_btn = st.button(
-            "Next Round →" if st.session_state.round < NUM_ROUNDS else "Submit & Finish →",
+            "Next Round →" if current_round < NUM_ROUNDS else "Submit & Finish →",
             type="primary",
             use_container_width=True,
             disabled=not all_answered,
-            key=f"submit_{st.session_state.round}"
+            key=f"submit_{current_round}",
         )
 
     if submit_btn and all_answered:
@@ -850,7 +824,7 @@ if st.session_state.page == "experiment":
 
         st.session_state.results.append(
             {
-                "round": st.session_state.round,
+                "round": current_round,
                 "condition": round_data["condition"],
                 "label_condition": round_data["label_condition"],
                 "image_A": os.path.basename(image_a["path"]),
@@ -867,13 +841,13 @@ if st.session_state.page == "experiment":
             }
         )
 
-        if st.session_state.round == NUM_ROUNDS:
+        if current_round == NUM_ROUNDS:
             try:
                 df_temp = pd.DataFrame(st.session_state.results)
                 total_correct = int(
                     df_temp["guess_A_correct"].sum() + df_temp["guess_B_correct"].sum()
                 )
-                
+
                 accuracy = float((total_correct / (NUM_ROUNDS * 2)) * 100)
                 payload = {
                     "pre_study": st.session_state.pre_study,
@@ -882,18 +856,20 @@ if st.session_state.page == "experiment":
                     "results": st.session_state.results,
                 }
 
-                requests.post(WEB_APP_URL, json=payload, timeout=5)
+                requests.post(WEB_APP_URL, json=payload, timeout=10)
             except Exception:
                 pass
 
         st.session_state.round += 1
         if st.session_state.round <= NUM_ROUNDS:
             st.session_state.current_round = generate_round()
+        else:
+            st.session_state.page = "results"
         st.rerun()
 
 
 # ---------------------------------------------------------
-# 3. RESULTS PAGE
+# 4. RESULTS PAGE
 # ---------------------------------------------------------
 if st.session_state.page == "results":
     st.markdown('<span class="meta-tag">Study Complete</span>', unsafe_allow_html=True)
@@ -903,7 +879,7 @@ if st.session_state.page == "results":
 
     df = pd.DataFrame(st.session_state.results)
     total_correct = int(df["guess_A_correct"].sum() + df["guess_B_correct"].sum())
-    total_predictions = len(df) * 2 - 2
+    total_predictions = len(df) * 2
     accuracy = (total_correct / total_predictions) * 100
 
     m1, m2, m3 = st.columns(3)
