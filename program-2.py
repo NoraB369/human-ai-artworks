@@ -42,9 +42,9 @@ st.markdown(
 
     /* Container layout */
     .block-container {
-        padding-top: 3.5rem !important;
-        padding-bottom: 4rem !important;
-        max-width: 960px !important;
+        padding-top: 2.5rem !important;
+        padding-bottom: 3.5rem !important;
+        max-width: 980px !important;
     }
 
     /* Typography hierarchy */
@@ -53,12 +53,14 @@ st.markdown(
         font-family: "Roboto", system-ui, -apple-system, sans-serif !important;
     }
 
-    /* Remove default boxed borders */
+    /* Container Box Styling for questionnaire items */
     [data-testid="stVerticalBlockBorderWrapper"] {
-        border: none !important;
+        border: 1px solid #d5cedb !important;
+        border-radius: 12px !important;
+        background: #ffffff !important;
+        padding: 12px 16px !important;
+        margin-bottom: 6px !important;
         box-shadow: none !important;
-        background: transparent !important;
-        padding: 0 !important;
     }
 
     /* Large artwork display with M3 Elevation */
@@ -70,7 +72,7 @@ st.markdown(
         margin-bottom: 1rem;
     }
     [data-testid="stImage"] img {
-        max-height: min(55vh, 480px) !important;
+        max-height: min(52vh, 450px) !important;
         width: 100% !important;
         object-fit: contain;
         border-radius: 16px;
@@ -80,7 +82,7 @@ st.markdown(
     /* M3 Typography & Metadata Tokens */
     .round-indicator {
         font-size: 0.85rem;
-        font-weight: 500;
+        font-weight: 600;
         letter-spacing: 0.05em;
         color: #49454f !important;
         text-transform: uppercase;
@@ -88,7 +90,7 @@ st.markdown(
     }
     .card-title {
         font-size: 1.25rem;
-        font-weight: 500;
+        font-weight: 600;
         letter-spacing: 0em;
         color: #1d1b20 !important;
         margin-bottom: 0.25rem;
@@ -96,9 +98,9 @@ st.markdown(
     .meta-tag {
         display: inline-block;
         font-size: 0.75rem;
-        font-weight: 500;
-        letter-spacing: 0.02em;
-        padding: 4px 12px;
+        font-weight: 600;
+        letter-spacing: 0.03em;
+        padding: 5px 12px;
         border-radius: 8px;
         background: #e8def8;
         color: #1d192b !important;
@@ -180,6 +182,7 @@ st.markdown(
         background-color: #ffffff !important;
         color: #1d1b20 !important;
         border: 1px solid #cac4d0 !important;
+        border-radius: 10px !important;
     }
     
     div[role="listbox"] {
@@ -193,38 +196,36 @@ st.markdown(
     
     div[role="option"]:hover {
         background-color: #f3edf7 !important;
+        color: #6750a4 !important;
     }
 
-    /* Short-answer text box */
+    /* Short-answer text box (High Contrast Fix) */
     .stTextArea textarea {
-        color: #ffffff !important;
-        background-color: #2b2b2b !important;
-        caret-color: #ffffff !important;
+        color: #1d1b20 !important;
+        background-color: #ffffff !important;
+        border: 1px solid #cac4d0 !important;
+        border-radius: 10px !important;
+        caret-color: #6750a4 !important;
+    }
+    
+    .stTextArea textarea:focus {
+        border-color: #6750a4 !important;
+        box-shadow: 0 0 0 2px #6750a422 !important;
     }
     
     /* Placeholder text */
     .stTextArea textarea::placeholder {
-        color: #cccccc !important;
+        color: #79747e !important;
     }
 
-    /* Streamlit dataframe */
+    /* Streamlit dataframe & tables */
     [data-testid="stDataFrame"] * {
-        color: white !important;
-    }
-    
-    /* AG Grid cells */
-    .ag-cell {
-        color: white !important;
-    }
-    
-    /* AG Grid headers */
-    .ag-header-cell-text {
-        color: white !important;
+        color: #1d1b20 !important;
     }
     
     /* Expander content */
     [data-testid="stExpander"] * {
-        color: white !important;
+        color: #1d1b20 !important;
     }
     </style>
 """,
@@ -916,3 +917,4 @@ if st.session_state.page == "results":
         st.dataframe(df, use_container_width=True, hide_index=True)
 
     st.write("")
+    
