@@ -22,7 +22,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed",
 )
 
-# Optimized Material Design 3 Stylesheet (Snappy Interactions & Full-Row Purple Chips)
+# Material Design 3 Stylesheet (Instant UI updates & hidden radio icons)
 st.markdown(
     """
     <style>
@@ -75,7 +75,7 @@ st.markdown(
         box-shadow: 0 0 0 2px #6750a422 !important;
     }
 
-    /* Full-Row Purple-Texted Response Chips for Pre-Study Questionnaire */
+    /* Full-Row Purple-Texted Response Chips & Hidden Radio Dots */
     [data-testid="stRadio"] [role="radiogroup"] {
         display: flex !important;
         flex-direction: row !important;
@@ -88,12 +88,18 @@ st.markdown(
         background: #f5f1f8 !important;
         border: 1px solid #ded6e7 !important;
         border-radius: 8px !important;
-        padding: 8px 6px !important;
+        padding: 10px 6px !important;
         flex: 1 !important;
         display: flex !important;
         justify-content: center !important;
         align-items: center !important;
+        cursor: pointer;
         transition: 0.1s ease;
+    }
+
+    /* Hide the default radio circle/dot icon */
+    [data-testid="stRadio"] [role="radiogroup"] label input[type="radio"] {
+        display: none !important;
     }
 
     [data-testid="stRadio"] [role="radiogroup"] label:hover {
@@ -114,11 +120,7 @@ st.markdown(
         text-align: center !important;
     }
 
-    [data-testid="stRadio"] input {
-        accent-color: #6750a4 !important;
-    }
-
-    /* Artwork Display Frame with Bottom-Right Label */
+    /* Artwork Display Frame */
     .artwork-frame {
         position: relative;
         width: 100%;
@@ -131,22 +133,6 @@ st.markdown(
         overflow: hidden;
         border-radius: 14px;
         background: #f7f2fa;
-    }
-
-    .artwork-tag {
-        position: absolute;
-        right: 12px;
-        bottom: 12px;
-        z-index: 2;
-        display: inline-block;
-        padding: 5px 12px;
-        background: #e8def8;
-        color: #1d192b !important;
-        font-size: 0.75rem;
-        font-weight: 700;
-        letter-spacing: 0.04em;
-        border-radius: 8px;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.14);
     }
 
     .round-indicator {
@@ -488,7 +474,7 @@ if st.session_state.page == "pre_study":
     st.stop()
 
 # ---------------------------------------------------------
-# 3. EXPERIMENT PAGE (SNAPPY STATE-BASED RENDERING)
+# 3. EXPERIMENT PAGE (INSTANT RERUN RESPONSIVENESS)
 # ---------------------------------------------------------
 if st.session_state.page == "experiment":
     if st.session_state.round > NUM_ROUNDS:
@@ -511,7 +497,6 @@ if st.session_state.page == "experiment":
         st.markdown('<div class="card-title">Artwork A</div>', unsafe_allow_html=True)
         st.markdown(f'<span class="meta-tag">Catalog: {round_data["display_label_a"]}</span>', unsafe_allow_html=True)
         
-        # Native Streamlit image rendering for maximum rendering speed
         st.image(round_data["image_a"]["path"], use_container_width=True)
         
         st.markdown('<p style="font-size: 0.875rem; font-weight: 600; color: #49454f; margin-bottom: 0.35rem;">Artwork A is:</p>', unsafe_allow_html=True)
@@ -522,9 +507,11 @@ if st.session_state.page == "experiment":
         with ga_col1:
             if st.button("Human-Made", key=f"btn_ga_h_{current_round}", use_container_width=True, type="primary" if current_guess_a == "Human-Made" else "secondary"):
                 st.session_state[guess_a_key] = "Human-Made"
+                st.rerun()
         with ga_col2:
             if st.button("AI-Generated", key=f"btn_ga_ai_{current_round}", use_container_width=True, type="primary" if current_guess_a == "AI-Generated" else "secondary"):
                 st.session_state[guess_a_key] = "AI-Generated"
+                st.rerun()
 
     with col_b:
         st.markdown('<div class="card-title">Artwork B</div>', unsafe_allow_html=True)
@@ -540,9 +527,11 @@ if st.session_state.page == "experiment":
         with gb_col1:
             if st.button("Human-Made", key=f"btn_gb_h_{current_round}", use_container_width=True, type="primary" if current_guess_b == "Human-Made" else "secondary"):
                 st.session_state[guess_b_key] = "Human-Made"
+                st.rerun()
         with gb_col2:
             if st.button("AI-Generated", key=f"btn_gb_ai_{current_round}", use_container_width=True, type="primary" if current_guess_b == "AI-Generated" else "secondary"):
                 st.session_state[guess_b_key] = "AI-Generated"
+                st.rerun()
 
     st.divider()
 
@@ -556,9 +545,11 @@ if st.session_state.page == "experiment":
         with p_col1:
             if st.button("Artwork A", key=f"btn_pref_a_{current_round}", use_container_width=True, type="primary" if current_pref == "Artwork A" else "secondary"):
                 st.session_state[pref_key] = "Artwork A"
+                st.rerun()
         with p_col2:
             if st.button("Artwork B", key=f"btn_pref_b_{current_round}", use_container_width=True, type="primary" if current_pref == "Artwork B" else "secondary"):
                 st.session_state[pref_key] = "Artwork B"
+                st.rerun()
 
     current_guess_a = st.session_state.get(guess_a_key)
     current_guess_b = st.session_state.get(guess_b_key)
