@@ -11,7 +11,7 @@ WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzFhfKVVRCVhbeS2gou4wC2mb
 # ---------------------------------------------------------
 # CONFIGURATION & MATERIAL DESIGN 3 SETUP
 # ---------------------------------------------------------
-NUM_ROUNDS = 5
+NUM_ROUNDS = 50
 HUMAN_DIR = "dataset/human-made"
 AI_DIR = "dataset/ai-generated"
 SUPPORTED_EXTENSIONS = (".jpg", ".jpeg", ".png")
