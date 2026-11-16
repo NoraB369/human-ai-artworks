@@ -23,11 +23,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed",
 )
 
-<<<<<<< HEAD
 # Material Design 3 Token Stylesheet with High Contrast Fixes
-=======
-# Material Design 3 Token Stylesheet with Compact Viewport & Custom Radio Chips
->>>>>>> parent of f30195e (Update program-2.py)
 st.markdown(
     """
     <style>
@@ -44,17 +40,11 @@ st.markdown(
         color: #1d1b20 !important;
     }
 
-    /* Ultra-compact container layout to prevent scrolling on artwork view */
+    /* Container layout */
     .block-container {
-<<<<<<< HEAD
         padding-top: 3.5rem !important;
         padding-bottom: 4rem !important;
         max-width: 960px !important;
-=======
-        padding-top: 1rem !important;
-        padding-bottom: 1rem !important;
-        max-width: 1100px !important;
->>>>>>> parent of f30195e (Update program-2.py)
     }
 
     /* Typography hierarchy */
@@ -63,94 +53,24 @@ st.markdown(
         font-family: "Roboto", system-ui, -apple-system, sans-serif !important;
     }
 
-<<<<<<< HEAD
     /* Remove default boxed borders */
     [data-testid="stVerticalBlockBorderWrapper"] {
         border: none !important;
-=======
-    div[data-testid="stVerticalBlock"] {
-        gap: 0.35rem !important;
-    }
-
-    /* Container Box Styling for questionnaire items */
-    [data-testid="stVerticalBlockBorderWrapper"] {
-        border: 1px solid #d5cedb !important;
-        border-radius: 10px !important;
-        background: #ffffff !important;
-        padding: 8px 12px !important;
-        margin-bottom: 4px !important;
->>>>>>> parent of f30195e (Update program-2.py)
         box-shadow: none !important;
         background: transparent !important;
         padding: 0 !important;
     }
 
-<<<<<<< HEAD
     /* Large artwork display with M3 Elevation */
-=======
-    /* Custom styling for horizontal 5-button radio options */
-    [data-testid="stRadio"] [role="radiogroup"] {
-        display: flex !important;
-        flex-direction: row !important;
-        flex-wrap: nowrap !important;
-        gap: 6px !important;
-        width: 100% !important;
-    }
-
-    [data-testid="stRadio"] [role="radiogroup"] label {
-        background: #f5f1f8 !important;
-        border: 1px solid #ded6e7 !important;
-        border-radius: 8px !important;
-        padding: 6px 4px !important;
-        flex: 1 !important;
-        display: flex !important;
-        justify-content: center !important;
-        align-items: center !important;
-        cursor: pointer;
-        transition: 0.1s ease;
-    }
-
-    [data-testid="stRadio"] [role="radiogroup"] label:hover {
-        background: #eaddff !important;
-        border-color: #6750a4 !important;
-    }
-
-    [data-testid="stRadio"] [role="radiogroup"] label:has(input:checked) {
-        background: #eaddff !important;
-        border: 1.5px solid #6750a4 !important;
-    }
-
-    [data-testid="stRadio"] [role="radiogroup"] label p {
-        font-size: 0.78rem !important;
-        font-weight: 650 !important;
-        color: #381e72 !important;
-        margin: 0 !important;
-        text-align: center !important;
-    }
-
-    [data-testid="stRadio"] input {
-        display: none !important;
-    }
-
-    /* Compact artwork display to ensure zero scrolling */
->>>>>>> parent of f30195e (Update program-2.py)
     [data-testid="stImage"] {
         display: flex;
         justify-content: center;
         align-items: center;
-<<<<<<< HEAD
         margin-top: 0.75rem;
         margin-bottom: 1rem;
     }
     [data-testid="stImage"] img {
         max-height: min(48vh, 420px) !important;
-=======
-        margin-top: 0.2rem;
-        margin-bottom: 0.4rem;
-    }
-    [data-testid="stImage"] img {
-        max-height: min(32vh, 280px) !important;
->>>>>>> parent of f30195e (Update program-2.py)
         width: 100% !important;
         object-fit: contain;
         border-radius: 16px;
@@ -164,22 +84,14 @@ st.markdown(
         letter-spacing: 0.05em;
         color: #49454f !important;
         text-transform: uppercase;
-<<<<<<< HEAD
         margin-bottom: 0.25rem;
-=======
-        margin-bottom: 0.15rem;
->>>>>>> parent of f30195e (Update program-2.py)
     }
     .card-title {
         font-size: 1.25rem;
         font-weight: 500;
         letter-spacing: 0em;
         color: #1d1b20 !important;
-<<<<<<< HEAD
         margin-bottom: 0.25rem;
-=======
-        margin-bottom: 0.15rem;
->>>>>>> parent of f30195e (Update program-2.py)
     }
     .meta-tag {
         display: inline-block;
@@ -190,11 +102,7 @@ st.markdown(
         border-radius: 8px;
         background: #e8def8;
         color: #1d192b !important;
-<<<<<<< HEAD
         margin-bottom: 0.5rem;
-=======
-        margin-bottom: 0.3rem;
->>>>>>> parent of f30195e (Update program-2.py)
     }
 
     /* Material 3 Progress Bar */
@@ -866,11 +774,7 @@ if st.session_state.page == "experiment":
         )
         st.image(round_data["image_a"]["path"], use_container_width=True)
         
-<<<<<<< HEAD
         st.markdown('<p style="font-size: 0.875rem; font-weight: 500; color: #49454f; margin-bottom: 0.4rem;">Artwork A is:</p>', unsafe_allow_html=True)
-=======
-        st.markdown('<p style="font-size: 0.8rem; font-weight: 500; color: #49454f; margin-top: 0.4rem; margin-bottom: 0.3rem;">Artwork A is:</p>', unsafe_allow_html=True)
->>>>>>> parent of f30195e (Update program-2.py)
         current_guess_a = st.session_state.get(guess_a_key)
         
         ga_col1, ga_col2 = st.columns(2)
@@ -891,11 +795,7 @@ if st.session_state.page == "experiment":
         )
         st.image(round_data["image_b"]["path"], use_container_width=True)
         
-<<<<<<< HEAD
         st.markdown('<p style="font-size: 0.875rem; font-weight: 500; color: #49454f; margin-bottom: 0.4rem;">Artwork B is:</p>', unsafe_allow_html=True)
-=======
-        st.markdown('<p style="font-size: 0.8rem; font-weight: 500; color: #49454f; margin-top: 0.4rem; margin-bottom: 0.3rem;">Artwork B is:</p>', unsafe_allow_html=True)
->>>>>>> parent of f30195e (Update program-2.py)
         current_guess_b = st.session_state.get(guess_b_key)
         
         gb_col1, gb_col2 = st.columns(2)
@@ -908,22 +808,14 @@ if st.session_state.page == "experiment":
                 st.session_state[guess_b_key] = "AI-Generated"
                 st.rerun()
 
-<<<<<<< HEAD
     st.write("")
     st.write("---")
-=======
-    st.markdown('<hr style="margin: 0.6rem 0; border: none; border-top: 1px solid #e7e0ec;">', unsafe_allow_html=True)
->>>>>>> parent of f30195e (Update program-2.py)
 
     # Preference selection & submission bar
     pref_col, btn_col = st.columns([1.3, 1], gap="medium", vertical_alignment="center")
 
     with pref_col:
-<<<<<<< HEAD
         st.markdown('<p style="font-size: 0.875rem; font-weight: 500; color: #49454f; margin-bottom: 0.4rem;">Preferred Artwork:</p>', unsafe_allow_html=True)
-=======
-        st.markdown('<p style="font-size: 0.8rem; font-weight: 500; color: #49454f; margin-bottom: 0.3rem;">Preferred Artwork:</p>', unsafe_allow_html=True)
->>>>>>> parent of f30195e (Update program-2.py)
         current_pref = st.session_state.get(pref_key)
         
         p_col1, p_col2 = st.columns(2)
